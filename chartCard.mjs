@@ -8,7 +8,7 @@ const ms = {
 
 class Element extends HTMLElement {
 
-	#_isZoomed
+	#_isExpanded
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -19,7 +19,7 @@ class Element extends HTMLElement {
 		this.attachShadow({mode: 'open'})
 		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("BLABLA"+(Math.random()*100))).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
-		this.#_isZoomed = false
+		this.#_isExpanded = false
 	}
 
 	get chart() {
@@ -59,12 +59,6 @@ class Element extends HTMLElement {
 		})
 		Chart.setYLabel(this.chart, "some Y label")
 
-		//const d = new Map()
-		//d.set("EU27_2020", 'European Union')
-		//d.set("GR", 'Greek')
-		//d.set("UG", 'Uganda')
-		//this.shadowRoot.querySelector("dropdown-box").data = [d, ["GR"]]
-		//this.shadowRoot.querySelector("dropdown-box").callback = () => console.log("HOWDY")
 	}
 
 	static get observedAttributes() {
@@ -74,24 +68,26 @@ class Element extends HTMLElement {
 	attributeChangedCallback(name, oldVal, newVal) {
 	}
 
-	toggleZoom(relativeTo) {
-		if(this.#_isZoomed) {
-			this.gb()
+	toggleExpansion(relativeTo) {
+		if(this.#_isExpanded) {
+			this.contract()
 		} else {
-			this.zi(relativeTo)
+			this.expand(relativeTo)
 		}
-		this.#_isZoomed = !this.#_isZoomed
-		return this.#_isZoomed
+		this.#_isExpanded = !this.#_isExpanded
+		return this.#_isExpanded
 	}
 
-	zi(relativeTo) {
+	expand(relativeTo) {
 		const chart = this.shadowRoot.getElementById("chart")
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
 
-		this.storedStyles = {chart:Object.assign({}, chart.style), 
+		this.storedStyles = {
+			chart: Object.assign({}, chart.style), 
 			div:Object.assign({}, div.style), 
-			sroot:Object.assign({}, sroot.style)}
+			sroot:Object.assign({}, sroot.style)
+		}
 			
 		sroot.style.position="fixed"
 		sroot.style.zIndex="1"
@@ -102,9 +98,13 @@ class Element extends HTMLElement {
 		div.style.top="-10px"
   	div.style.left="-10px"
 		div.style.borderRadius=0
+
+		this.shadowRoot.getElementById("slotContainer").style.display="inline"
+
+		//Chart.resize(chart, div.clientWidth, div.clientHeight)
 	}
 
-	gb() {
+	contract() {
 		const chart = this.shadowRoot.getElementById("chart")
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
@@ -121,15 +121,8 @@ class Element extends HTMLElement {
 		div.style.left=""
 		div.style.zIndex=""
 		div.style.borderRadius=this.storedStyles.div.borderRadius
-	}
 
-	attachElement(el) {
-		//const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.dropdownBox())
-		this.shadowRoot.querySelector("div").after(el)
-	}
-
-	yankElement() {
-		return this.shadowRoot.querySelector("dropdown-box")
+		this.shadowRoot.getElementById("slotContainer").style.display="none"
 	}
 }
 
