@@ -9,6 +9,7 @@ const ms = {
 class Element extends HTMLElement {
 
 	#_isExpanded
+	#_anchor
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -24,6 +25,10 @@ class Element extends HTMLElement {
 
 	get chart() {
 		return this.shadowRoot.getElementById("chart")
+	}
+
+	set anchor(val) {
+		this.setAttribute("anchor",val)
 	}
 
 	connectedCallback() {
@@ -59,13 +64,28 @@ class Element extends HTMLElement {
 		})
 		Chart.setYLabel(this.chart, "some Y label")
 
+		this.#$("close").addEventListener("click", (ev) => {
+			if(this.#_isExpanded) {
+				this.contract() 
+			}
+			ev.stopPropagation()
+		})
+
+		this.#$("main").addEventListener("click", () => {
+			if(!this.#_isExpanded) {
+				this.expand(document.getElementById(this.#_anchor)) 
+			}
+		})
 	}
 
 	static get observedAttributes() {
-		return []
+		return ["anchor"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
+		if(name==="anchor") {
+			this.#_anchor = newVal
+		}
 	}
 
 	toggleExpansion(relativeTo) {
@@ -74,7 +94,6 @@ class Element extends HTMLElement {
 		} else {
 			this.expand(relativeTo)
 		}
-		this.#_isExpanded = !this.#_isExpanded
 		return this.#_isExpanded
 	}
 
@@ -102,6 +121,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainer").style.display="inline"
 
 		//Chart.resize(chart, div.clientWidth, div.clientHeight)
+		this.#_isExpanded = true
 	}
 
 	contract() {
@@ -123,6 +143,7 @@ class Element extends HTMLElement {
 		div.style.borderRadius=this.storedStyles.div.borderRadius
 
 		this.shadowRoot.getElementById("slotContainer").style.display="none"
+		this.#_isExpanded = false
 	}
 }
 

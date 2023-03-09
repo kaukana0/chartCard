@@ -20,7 +20,8 @@ export default class MarkUpCode {
 			}
 		</style>
 
-		<div tabindex="0" class="main" style="padding:10px; background-color:white;">
+		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
+			<div id="close" style="right:10px; top:10px;">X</div>
 			<div style="height:10%;">${title}</div>
 			<div style="height:5%;">Subtitle</div>
 			<div id="slotContainer" style="display:none;"> <slot name="slot1"></slot> </div>
