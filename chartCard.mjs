@@ -66,6 +66,9 @@ class Element extends HTMLElement {
 
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
+				const event = new Event("contract")
+				this.dispatchEvent(event)
+
 				this.contract() 
 			}
 			ev.stopPropagation()
@@ -73,7 +76,10 @@ class Element extends HTMLElement {
 
 		this.#$("main").addEventListener("click", () => {
 			if(!this.#_isExpanded) {
-				this.expand(document.getElementById(this.#_anchor)) 
+				const event = new Event("expand")
+				this.dispatchEvent(event)
+
+				this.expand(document.getElementById(this.#_anchor))
 			}
 		})
 	}
