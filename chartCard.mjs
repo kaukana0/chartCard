@@ -6,6 +6,7 @@ import {process as defineCountryColors} from "../processorCountryColors/countryC
 const ms = {
 }
 
+// note: The card isn't aware about the slot content - it makes no assumptions about what it is.
 class Element extends HTMLElement {
 
 	#_isExpanded
@@ -66,7 +67,7 @@ class Element extends HTMLElement {
 
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
-				const event = new Event("contract")
+				const event = new Event("contracting")
 				this.dispatchEvent(event)
 
 				this.contract() 
@@ -76,7 +77,7 @@ class Element extends HTMLElement {
 
 		this.#$("main").addEventListener("click", () => {
 			if(!this.#_isExpanded) {
-				const event = new Event("expand")
+				const event = new Event("expanding")
 				this.dispatchEvent(event)
 
 				this.expand(document.getElementById(this.#_anchor))
