@@ -1,6 +1,5 @@
 import MarkUpCode from  "./markUpCode.mjs"		// keep this file html/css free
 import * as Chart from "../chart/chart.mjs"
-import {process as defineCountryColors} from "../processorCountryColors/countryColors.mjs"
 
 // magic strings
 const ms = {
@@ -33,38 +32,6 @@ class Element extends HTMLElement {
 	}
 
 	connectedCallback() {
-		let data = {}
-		defineCountryColors({}, data)
-	
-		const labels = new Map()
-		labels.set("XY","Tleilaxu")
-		labels.set("EO","Eolomea")
-
-		const cols = [
-			['08-2022', '09-2022', '10-2022', '11-2022', '12-2022'],
-			['XY'],
-			['EO']
-		]
-
-		for(var i=0;i<5;i++) {
-			cols[1].push(Math.random()*100)
-			cols[2].push(Math.random()*100)
-		}
-
-		Chart.init({
-			type: "line",
-			chartDOMElementId: this.chart,
-			//legendDOMElementId: "legend",
-			cols: cols,
-			//fixColors: {...data.countryColors, ...data.indexColors},
-			palette: data.colorPalette,
-			seriesLabels: labels,
-			//suffixText: "getTooltipSuffix()",
-			//isRotated: false,
-			//onFinished: onFinished
-		})
-		Chart.setYLabel(this.chart, "some Y label")
-
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
 				const event = new Event("contracting")
@@ -151,6 +118,26 @@ class Element extends HTMLElement {
 
 		this.shadowRoot.getElementById("slotContainer").style.display="none"
 		this.#_isExpanded = false
+	}
+
+	setData(data) {
+		const labels = new Map()
+		labels.set("XY","Tleilaxu")
+		labels.set("EO","Eolomea")
+
+		Chart.init({
+			type: "line",
+			chartDOMElementId: this.chart,
+			//legendDOMElementId: "legend",
+			cols: data.cols,
+			//fixColors: {...data.countryColors, ...data.indexColors},
+			palette: data.colorPalette,
+			seriesLabels: labels,
+			//suffixText: "getTooltipSuffix()",
+			//isRotated: false,
+			//onFinished: onFinished
+		})
+		Chart.setYLabel(this.chart, "some Y label")
 	}
 }
 
