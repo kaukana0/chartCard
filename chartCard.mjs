@@ -18,7 +18,7 @@ class Element extends HTMLElement {
 	constructor() {
 		super()
 		this.attachShadow({mode: 'open'})
-		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("BLABLA"+(Math.random()*100))).cloneNode(true)
+		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("No title")).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		this.#_isExpanded = false
 	}
@@ -53,12 +53,15 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor"]
+		return ["anchor", "title", "subtitle", "right1", "right2"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		if(name==="anchor") {
 			this.#_anchor = newVal
+		}
+		if( "title subtitle right1 right2".includes(name) ) {
+			this.shadowRoot.getElementById(name).innerHTML = newVal
 		}
 	}
 
@@ -121,18 +124,14 @@ class Element extends HTMLElement {
 	}
 
 	setData(data) {
-		const labels = new Map()
-		labels.set("XY","Tleilaxu")
-		labels.set("EO","Eolomea")
-
 		Chart.init({
 			type: "line",
 			chartDOMElementId: this.chart,
-			//legendDOMElementId: "legend",
+			legendDOMElementId: this.shadowRoot.getElementById("legend"),
 			cols: data.cols,
 			//fixColors: {...data.countryColors, ...data.indexColors},
 			palette: data.colorPalette,
-			seriesLabels: labels,
+			seriesLabels: data.seriesLabels,
 			//suffixText: "getTooltipSuffix()",
 			//isRotated: false,
 			//onFinished: onFinished
