@@ -22,12 +22,23 @@ export default class MarkUpCode {
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
 			<div id="close" style="right:10px; top:10px;">X</div>
 			<div id="slotContainer" style="display:none;"> <slot name="slot1"></slot> </div>
+			<div id="switch" style="height:1%; text-align:right;">
+				<p id="switchTo1" style="display:inline;">Line</p>
+				<p id="switchTo2" style="display:inline;">Bar</p>
+			</div>
 			<div id="title" style="height:10%;">${title}</div>
 			<div id="subtitle" style="height:5%;">Subtitle</div>
-			<div id="right1" style="height:10%; text-align:right;">100.0%</div>
+			<div id="right1" style="height:5%; text-align:right;">100.0%</div>
 			<div id="right2" style="height:5%; text-align:right;">2023</div>
 			<div style="height:10%;" id='legend'></div>
-			<div style="height:70%;" id='chart'></div>
+			<div style="height:70%; position:relative;" id='chartContainer'>
+				<div style="top:0px; position:absolute; background:white;">
+					<div id='chart1'></div>
+				</div>
+				<div style="top:0px; position:absolute; background:white;">
+					<div id='chart2'></div>
+				</div>
+			</div>
 		</div>
 	`}
 
