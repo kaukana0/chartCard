@@ -4,6 +4,7 @@ all HTML and CSS as JS string
 
 export default class MarkUpCode {
 
+	// TODO: put .hide-line in chart, not here
 	static mainElements(title) { return `
 		<link rel="stylesheet" href="redist/billboard-3.4.1/billboard.min.css">
 
@@ -17,6 +18,7 @@ export default class MarkUpCode {
 				border-radius: 15px;
 				overflow: hidden;
 			}
+			.hide-line { stroke-width: 0px; }
 		</style>
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
