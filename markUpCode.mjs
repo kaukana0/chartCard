@@ -22,25 +22,32 @@ export default class MarkUpCode {
 		</style>
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
-			<div id="close" style="right:10px; top:10px;">X</div>
+			<button id="close" type="button" style="float:right; display:none;">X</button>
 			<div id="slotContainer" style="display:none;"> <slot name="slot1"></slot> </div>
-			<div id="switch" style="height:1%; text-align:right;">
-				<p id="switchTo1" style="display:inline;">Line</p>
-				<p id="switchTo2" style="display:inline;">Bar</p>
+			<div id="switch" style="height:1%; text-align:right; display:none;">
+				<button id="switchTo1" type="button">Line</button>
+				<button id="switchTo2" type="button">Bar</button>
 			</div>
-			<div id="title" style="height:10%;">${title}</div>
+			<h2 id="header" style="height:10%;">${title}</h2>
 			<div id="subtitle" style="height:5%;">Subtitle</div>
 			<div id="right1" style="height:5%; text-align:right;">100.0%</div>
 			<div id="right2" style="height:5%; text-align:right;">2023</div>
-			<div style="height:10%;" id='legend'></div>
+
+
 			<div style="height:70%; position:relative;" id='chartContainer'>
-				<div style="top:0px; position:absolute; background:white;">
-					<div id='chart1'></div>
+
+				<div style="top:0px; position:absolute; background:white;   display: flex; flex-direction: row; flex-wrap: wrap; width: 100%;  ">
+					<div id='chart1' style="display: flex; flex-direction: column; flex-basis: 100%; flex: 4;"></div>
+					<div style="height:10%;    display: flex; flex-direction: column; flex-basis: 100%; flex: 1; " id='legend1'></div>
 				</div>
 				<div style="top:0px; position:absolute; background:white;">
+					<div style="height:10%;" id='legend2'></div>
 					<div id='chart2'></div>
 				</div>
+	
 			</div>
+
+
 		</div>
 	`}
 

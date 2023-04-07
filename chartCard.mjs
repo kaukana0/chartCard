@@ -77,14 +77,14 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "title", "subtitle", "right1", "right2"]
+		return ["anchor", "header", "subtitle", "right1", "right2"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		if(name==="anchor") {
 			this.#_anchor = newVal
 		}
-		if( "title subtitle right1 right2".includes(name) ) {
+		if( "header subtitle right1 right2".includes(name) ) {
 			this.shadowRoot.getElementById(name).innerHTML = newVal
 		}
 	}
@@ -120,6 +120,8 @@ class Element extends HTMLElement {
 		div.style.borderRadius=0
 
 		this.shadowRoot.getElementById("slotContainer").style.display="inline"
+		this.shadowRoot.getElementById("close").style.display="inline"
+		this.shadowRoot.getElementById("switch").style.display="block"
 		this.#resize()
 		this.#_isExpanded = true
 	}
@@ -142,21 +144,24 @@ class Element extends HTMLElement {
 		div.style.borderRadius=this.storedStyles.div.borderRadius
 
 		this.shadowRoot.getElementById("slotContainer").style.display="none"
+		this.shadowRoot.getElementById("close").style.display="none"
+		this.shadowRoot.getElementById("switch").style.display="none"
 		this.#resize()
 		this.#_isExpanded = false
+
+		this.#showChart1(true)
 	}
 
 	setData1(cols, colorPalette, seriesLabels) {
 		Chart.init({
 			type: "line",
 			chartDOMElementId: this.chart1,
-			legendDOMElementId: this.shadowRoot.getElementById("legend"),
+			legendDOMElementId: this.shadowRoot.getElementById("legend1"),
 			cols: cols,
 			//fixColors: {...data.countryColors, ...data.indexColors},
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
-			//isRotated: false,
 			//onFinished: this.#resize.bind(this)
 		})
 		Chart.setYLabel(this.chart1, "some Y label")
@@ -166,13 +171,12 @@ class Element extends HTMLElement {
 		Chart.init({
 			type: "line",
 			chartDOMElementId: this.chart2,
-			legendDOMElementId: this.shadowRoot.getElementById("legend"),
+			legendDOMElementId: this.shadowRoot.getElementById("legend2"),
 			cols: cols,
 			//fixColors: {...data.countryColors, ...data.indexColors},
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
-			//isRotated: false,
 			//onFinished: this.#resize.bind(this)
 			showLines:false
 		})
