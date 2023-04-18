@@ -99,6 +99,8 @@ class Element extends HTMLElement {
 	}
 
 	expand(relativeTo) {
+		if(this.#_isExpanded) return
+
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
 
@@ -127,6 +129,8 @@ class Element extends HTMLElement {
 	}
 
 	contract() {
+		if(!this.#_isExpanded) return
+
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
 
