@@ -23,7 +23,7 @@ export default class MarkUpCode {
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
 			<button id="close" type="button" style="float:right; display:none;">X</button>
-			<div id="slotContainer" style="display:none;"> <slot name="slot1"></slot> </div>
+			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slot1"></slot> </div>
 			<div id="switch" style="height:1%; text-align:right; display:none;">
 				<button id="switchTo1" type="button">Line</button>
 				<button id="switchTo2" type="button">Bar</button>
