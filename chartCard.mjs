@@ -38,9 +38,6 @@ class Element extends HTMLElement {
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
-				const event = new Event("contracting")
-				this.dispatchEvent(event)
-
 				this.contract() 
 			}
 			ev.stopPropagation()
@@ -48,9 +45,6 @@ class Element extends HTMLElement {
 
 		this.#$("main").addEventListener("click", () => {
 			if(!this.#_isExpanded) {
-				const event = new Event("expanding")
-				this.dispatchEvent(event)
-
 				this.expand(document.getElementById(this.#_anchor))
 			}
 		})
@@ -68,7 +62,7 @@ class Element extends HTMLElement {
 		this.#showChart1(true)
 	}
 
-	// billboard doesn't like to draw when hidden, so one solution is to move it out of sight
+	// billboard refuses to draw when hidden, so one solution is to move it out of sight
 	#showChart1(show) {
 		const showPos="0px"
 		const hidePos="1000px"
@@ -126,6 +120,9 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("switch").style.display="block"
 		this.#resize()
 		this.#_isExpanded = true
+
+		const event = new Event("expanding")
+		this.dispatchEvent(event)
 	}
 
 	contract() {
@@ -154,8 +151,12 @@ class Element extends HTMLElement {
 		this.#_isExpanded = false
 
 		this.#showChart1(true)
-	}
 
+		const event = new Event("contracting")
+		this.dispatchEvent(event)
+}
+
+	// bar chart
 	setData1(cols, colorPalette, seriesLabels) {
 		Chart.init({
 			type: "line",
@@ -171,6 +172,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, "some Y label")
 	}
 
+	// vertically connected dot plot (VCDP)
 	setData2(cols, colorPalette, seriesLabels) {
 		Chart.init({
 			type: "line",

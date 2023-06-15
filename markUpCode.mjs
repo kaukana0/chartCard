@@ -10,14 +10,21 @@ export default class MarkUpCode {
 
 		<style>
 			.main {
-				width:500px;
-				height:500px;
+				width:420px;
+				height:420px;
 				margin:10px;
-				border-width: 1px;
+				border-width: 4px;
 				border-style: solid;
-				border-radius: 15px;
+				border-radius: 10px;
+				border-color: #ecedf1;
 				overflow: hidden;
+				box-shadow: 1px 1px 4px 2px rgba(0,0,0,.08), inset 0 0 8px rgba(43,53,98,.18);
 			}
+
+			.main:hover {
+        box-shadow: 2px 2px 6px 4px rgba(0,0,0,0.14), inset 0 0 10px rgba(5, 116, 173, 0.64);
+      }
+
 			.hide-line { stroke-width: 0px; }
 		</style>
 
@@ -25,8 +32,8 @@ export default class MarkUpCode {
 			<button id="close" type="button" style="float:right; display:none;">X</button>
 			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slot1"></slot> </div>
 			<div id="switch" style="height:1%; text-align:right; display:none;">
-				<button id="switchTo1" type="button">Line</button>
-				<button id="switchTo2" type="button">Bar</button>
+				<button id="switchTo1" type="button">Lines</button>
+				<button id="switchTo2" type="button">Dots</button>
 			</div>
 			<h2 id="header" style="height:10%;">${title}</h2>
 			<div id="subtitle" style="height:5%;">Subtitle</div>
