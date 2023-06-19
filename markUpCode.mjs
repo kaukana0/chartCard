@@ -13,9 +13,9 @@ export default class MarkUpCode {
 				width:420px;
 				height:420px;
 				margin:10px;
-				border-width: 4px;
+				border-width: 2px;
 				border-style: solid;
-				border-radius: 10px;
+				border-radius: 5px;
 				border-color: #ecedf1;
 				overflow: hidden;
 				box-shadow: 1px 1px 4px 2px rgba(0,0,0,.08), inset 0 0 8px rgba(43,53,98,.18);
