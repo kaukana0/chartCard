@@ -21,6 +21,7 @@ class Element extends HTMLElement {
 		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("No title")).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		this.#_isExpanded = false
+		this.indicateLoading()
 	}
 
 	get chart1() {
@@ -42,6 +43,15 @@ class Element extends HTMLElement {
 			}
 			ev.stopPropagation()
 		})
+
+		this.shadowRoot.addEventListener('keydown', (e) => {
+			if(e.keyCode == 27) {
+				if(this.#_isExpanded) {
+					this.contract() 
+				}
+				ev.stopPropagation()
+			}
+	})
 
 		this.#$("main").addEventListener("click", () => {
 			if(!this.#_isExpanded) {
@@ -200,6 +210,15 @@ class Element extends HTMLElement {
 			}
 		}
 	}
+
+	indicateLoading() {
+		this.shadowRoot.getElementById("main").classList.add("loading")
+	}
+
+	stopIndicateLoading() {
+		this.shadowRoot.getElementById("main").classList.remove("loading")
+	}
+
 }
 
 window.customElements.define('chart-card', Element)

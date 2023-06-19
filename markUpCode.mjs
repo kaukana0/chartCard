@@ -56,7 +56,36 @@ export default class MarkUpCode {
 
 
 		</div>
+
+		${MarkUpCode.loaderCSS()}
 	`}
+
+	
+	static loaderCSS() {
+		return `<style>
+
+		.loading {
+			position: relative;
+			background: #cccccc;
+	}
+	.loading:after {
+			content: "";
+			/*display: block;*/
+			/*position: absolute;*/
+			top: 0;
+			width: 100%;
+			height: 100%;
+			transform: translateX(-100px);
+			background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+			animation: loading 0.8s infinite;
+	}
+	@keyframes loading {
+			100% {
+					transform: translateX(100%);
+			}
+
+			</style>`
+	}
 
   	// helper
 	static getHtmlTemplate(source) {
