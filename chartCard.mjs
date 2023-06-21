@@ -1,5 +1,11 @@
 import MarkUpCode from  "./markUpCode.mjs"		// keep this file html/css free
+
 import * as Chart from "../chart/chart.mjs"
+import * as ChartGrid from "../chart/grid.mjs"
+import * as ChartAxis from "../chart/axis.mjs"
+import * as ChartTooltip from "../chart/tooltip.mjs"
+
+import "../buttonX/button.mjs"
 
 // magic strings
 const ms = {
@@ -20,6 +26,10 @@ class Element extends HTMLElement {
 		this.attachShadow({mode: 'open'})
 		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("No title")).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
+		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
+		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
+			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()
+		))
 		this.#_isExpanded = false
 		this.indicateLoading()
 	}
@@ -81,7 +91,7 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header", "subtitle", "right1", "right2"]
+		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
@@ -90,6 +100,10 @@ class Element extends HTMLElement {
 		}
 		if( "header subtitle right1 right2".includes(name) ) {
 			this.shadowRoot.getElementById(name).innerHTML = newVal
+		}
+		if(name==="ylabel") {
+			Chart.setYLabel(this.chart1, newVal)
+			Chart.setYLabel(this.chart2, newVal)
 		}
 	}
 
@@ -128,8 +142,12 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainer").style.display="inline"
 		this.shadowRoot.getElementById("close").style.display="inline"
 		this.shadowRoot.getElementById("switch").style.display="block"
+		this.shadowRoot.getElementById("staticLegend").style.display="none"
+		this.shadowRoot.getElementById("right1").style.display="none"
+		this.shadowRoot.getElementById("right2").style.display="none"
 		this.#resize()
 		this.#_isExpanded = true
+
 
 		const event = new Event("expanding")
 		this.dispatchEvent(event)
@@ -157,6 +175,9 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainer").style.display="none"
 		this.shadowRoot.getElementById("close").style.display="none"
 		this.shadowRoot.getElementById("switch").style.display="none"
+		this.shadowRoot.getElementById("staticLegend").style.display="block"
+		this.shadowRoot.getElementById("right1").style.display="block"
+		this.shadowRoot.getElementById("right2").style.display="block"
 		this.#resize()
 		this.#_isExpanded = false
 
@@ -166,28 +187,33 @@ class Element extends HTMLElement {
 		this.dispatchEvent(event)
 }
 
-	// bar chart
+	// bar chart; please take note of comment on #resize().
 	setData1(cols, colorPalette, seriesLabels) {
+		//console.log(seriesLabels)
 		Chart.init({
 			type: "line",
 			chartDOMElementId: this.chart1,
-			legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+			//legendDOMElementId: this.shadowRoot.getElementById("legend1"),
 			cols: cols,
 			//fixColors: {...data.countryColors, ...data.indexColors},
+			fixColors:{
+				"Nationals, EU":"#0e47cb",				// mittelblau
+				"EU Citizens, EU":"#082b7a",			// dunkelblau
+				"Non EU Citizens, EU": "#388ae2"	// hellblau		TODO: go through seriesLabels
+			},
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
 			//onFinished: this.#resize.bind(this)
 		})
-		Chart.setYLabel(this.chart1, "some Y label")
 	}
 
-	// vertically connected dot plot (VCDP)
+	// vertically connected dot plot (VCDP); please take note of comment on #resize().
 	setData2(cols, colorPalette, seriesLabels) {
 		Chart.init({
 			type: "line",
 			chartDOMElementId: this.chart2,
-			legendDOMElementId: this.shadowRoot.getElementById("legend2"),
+			//legendDOMElementId: this.shadowRoot.getElementById("legend2"),
 			cols: cols,
 			//fixColors: {...data.countryColors, ...data.indexColors},
 			palette: colorPalette,
@@ -198,7 +224,10 @@ class Element extends HTMLElement {
 		})
 	}
 
-	// take care: billboard doesn't like to get fed data while resizing. 
+	// take care: billboard doesn't like to get fed data while resizing.
+	// it might lead to CPU overload and the site not responding to user input.
+	// solution: use billboard's onResize() callback  TODO!
+	// workaround: rely on setTimeout (doesn't work in every case)
 	#resize() {
 		if(this && this.shadowRoot) {
 			const r = this.shadowRoot.getElementById("chartContainer")

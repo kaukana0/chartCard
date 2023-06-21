@@ -2,9 +2,9 @@
 all HTML and CSS as JS string
 */
 
+
 export default class MarkUpCode {
 
-	// TODO: put .hide-line in chart, not here
 	static mainElements(title) { return `
 		<link rel="stylesheet" href="redist/billboard-3.4.1/billboard.min.css">
 
@@ -25,21 +25,27 @@ export default class MarkUpCode {
         box-shadow: 2px 2px 6px 4px rgba(0,0,0,0.14), inset 0 0 10px rgba(5, 116, 173, 0.64);
       }
 
-			.hide-line { stroke-width: 0px; }
+			.thick-line { stroke-width: 3.5px; }
+
 		</style>
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
-			<button id="close" type="button" style="float:right; display:none;">X</button>
+
+			<symbol-button id="close" symbol="close" style="float:right; display:none;"></symbol-button>
+
 			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slot1"></slot> </div>
 			<div id="switch" style="height:1%; text-align:right; display:none;">
-				<button id="switchTo1" type="button">Lines</button>
-				<button id="switchTo2" type="button">Dots</button>
+				<symbol-button id="switchTo1" symbol="lineChart"></symbol-button>
+				<symbol-button id="switchTo2" symbol="barChart"></symbol-button>
 			</div>
-			<h2 id="header" style="height:10%;">${title}</h2>
+			<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
 			<div id="subtitle" style="height:5%;">Subtitle</div>
-			<div id="right1" style="height:5%; text-align:right;">100.0%</div>
-			<div id="right2" style="height:5%; text-align:right;">2023</div>
+			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
+			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
+			<center>
+			<img id="staticLegend" src="/img/static-legend.png" alt="legend"/>
+			</center>
 
 			<div style="height:70%; position:relative;" id='chartContainer'>
 
