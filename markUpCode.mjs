@@ -5,13 +5,15 @@ all HTML and CSS as JS string
 
 export default class MarkUpCode {
 
-	static mainElements(title) { return `
+	// the important is there because FF prefers a different value (per "best match")
+	static mainElements(title, w, h) { return `
 		<link rel="stylesheet" href="redist/billboard-3.4.1/billboard.min.css">
 
 		<style>
+		
 			.main {
-				width:420px;
-				height:420px;
+				width:${w};
+				height:${h};
 				margin:10px;
 				border-width: 2px;
 				border-style: solid;
@@ -34,9 +36,10 @@ export default class MarkUpCode {
 			<symbol-button id="close" symbol="close" style="float:right; display:none;"></symbol-button>
 
 			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slot1"></slot> </div>
-			<div id="switch" style="height:1%; text-align:right; display:none;">
-				<symbol-button id="switchTo1" symbol="lineChart"></symbol-button>
-				<symbol-button id="switchTo2" symbol="barChart"></symbol-button>
+			<div id="switch" style="height:60px; text-align:right; display:none;">
+				<br><br>
+				<symbol-button id="switchTo1" symbol="lineChart" style="height: 70px; width: 70px; padding-right:15px;"></symbol-button>
+				<symbol-button id="switchTo2" symbol="barChart"  style="height: 70px; width: 70px;"></symbol-button>
 			</div>
 			<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
 			<div id="subtitle" style="height:5%;">Subtitle</div>

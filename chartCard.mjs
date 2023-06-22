@@ -8,10 +8,12 @@ import * as ChartTooltip from "../chart/tooltip.mjs"
 import "../buttonX/button.mjs"
 
 // magic strings
-const ms = {
+const MS = {
+	width: "420px",
+	height: "420px"
 }
 
-// note: The card isn't aware about the slot content - it makes no assumptions about what it is.
+// note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
 class Element extends HTMLElement {
 
 	#_isExpanded
@@ -24,7 +26,7 @@ class Element extends HTMLElement {
 	constructor() {
 		super()
 		this.attachShadow({mode: 'open'})
-		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("No title")).cloneNode(true)
+		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("No title", MS.width, MS.height)).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
 		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
@@ -54,8 +56,8 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
-		this.shadowRoot.addEventListener('keydown', (e) => {
-			if(e.keyCode == 27) {
+		this.shadowRoot.addEventListener('keydown', (ev) => {
+			if(ev.keyCode == 27) {
 				if(this.#_isExpanded) {
 					this.contract() 
 				}
@@ -122,13 +124,12 @@ class Element extends HTMLElement {
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
 
-		// TODO: check if chart2 has to be considered here
 		this.storedStyles = {
 			chart: Object.assign({}, this.chart1.style), 
 			div:Object.assign({}, div.style), 
 			sroot:Object.assign({}, sroot.style)
 		}
-			
+
 		sroot.style.position="fixed"
 		sroot.style.zIndex="1"
 
@@ -161,12 +162,12 @@ class Element extends HTMLElement {
 
 		sroot.style.position=""
 		sroot.style.zIndex=""
-		sroot.style.width=this.storedStyles.sroot.width
-		sroot.style.height= this.storedStyles.sroot.width
+		sroot.style.width=""
+		sroot.style.height=""
 
 		div.style.position=""
-		div.style.width=this.storedStyles.div.width
-		div.style.height=this.storedStyles.div.height
+		div.style.width=MS.width
+		div.style.height=MS.height
 		div.style.top=""
 		div.style.left=""
 		div.style.zIndex=""
