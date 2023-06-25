@@ -231,7 +231,7 @@ class Element extends HTMLElement {
 		if(this && this.shadowRoot) {
 			const r = this.shadowRoot.getElementById("chartContainer")
 			if(this.chart1) {
-				Chart.resize(this.chart1, r.clientWidth, r.clientHeight*0.8, callback)
+				Chart.resize(this.chart1, r.clientWidth, r.clientHeight*0.8)
 			}
 			if(this.chart2) {
 				Chart.resize(this.chart2, r.clientWidth, r.clientHeight*0.8, callback)
