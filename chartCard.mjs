@@ -146,12 +146,12 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("staticLegend").style.display="none"
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
-		this.#resize()
 		this.#_isExpanded = true
 
-
-		const event = new Event("expanding")
-		this.dispatchEvent(event)
+		this.#resize(() => {
+			const event = new Event("expanding")
+			this.dispatchEvent(event)
+		})		
 	}
 
 	contract() {
@@ -179,14 +179,16 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("staticLegend").style.display="block"
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
-		this.#resize()
 		this.#_isExpanded = false
 
-		this.#showChart1(true)
+		this.#resize(() => {
+			this.#showChart1(true)
+	
+			const event = new Event("contracting")
+			this.dispatchEvent(event)
+		})
 
-		const event = new Event("contracting")
-		this.dispatchEvent(event)
-}
+	}
 
 	// bar chart; please take note of comment on #resize().
 	setData1(cols, colorPalette, seriesLabels) {
@@ -205,7 +207,6 @@ class Element extends HTMLElement {
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
-			//onFinished: this.#resize.bind(this)
 		})
 	}
 
@@ -220,23 +221,20 @@ class Element extends HTMLElement {
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
-			//onFinished: this.#resize.bind(this)
 			showLines:false
 		})
 	}
 
 	// take care: billboard doesn't like to get fed data while resizing.
 	// it might lead to CPU overload and the site not responding to user input.
-	// solution: use billboard's onResize() callback  TODO!
-	// workaround: rely on setTimeout (doesn't work in every case)
-	#resize() {
+	#resize(callback) {
 		if(this && this.shadowRoot) {
 			const r = this.shadowRoot.getElementById("chartContainer")
 			if(this.chart1) {
-				Chart.resize(this.chart1, r.clientWidth, r.clientHeight*0.8)
+				Chart.resize(this.chart1, r.clientWidth, r.clientHeight*0.8, callback)
 			}
 			if(this.chart2) {
-				Chart.resize(this.chart2, r.clientWidth, r.clientHeight*0.8)
+				Chart.resize(this.chart2, r.clientWidth, r.clientHeight*0.8, callback)
 			}
 		}
 	}
