@@ -18,6 +18,8 @@ class Element extends HTMLElement {
 
 	#_isExpanded
 	#_anchor
+	#_tooltipExtFn1
+	#_tooltipExtFn2
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -30,6 +32,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.appendChild(tmp)
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
 		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
+			// standard chart tooltip css; can be overwritten
 			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()
 		))
 		this.#_isExpanded = false
@@ -48,6 +51,12 @@ class Element extends HTMLElement {
 		this.setAttribute("anchor",val)
 	}
 
+	set tooltipFn1(val) {this.#_tooltipExtFn1 = val}
+	set tooltipFn2(val) {this.#_tooltipExtFn2 = val}
+	set tooltipCSS(val) { 
+		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(val)) 
+	}
+
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
@@ -63,7 +72,7 @@ class Element extends HTMLElement {
 				}
 				ev.stopPropagation()
 			}
-	})
+		})
 
 		this.#$("main").addEventListener("click", () => {
 			if(!this.#_isExpanded) {
@@ -101,12 +110,52 @@ class Element extends HTMLElement {
 			this.#_anchor = newVal
 		}
 		if( "header subtitle right1 right2".includes(name) ) {
-			this.shadowRoot.getElementById(name).innerHTML = newVal
+			if(this.shadowRoot.getElementById(name)) {
+				this.shadowRoot.getElementById(name).innerHTML = newVal
+			} else {
+				console.error("chartCard: not initialized yet")
+			}
 		}
 		if(name==="ylabel") {
 			Chart.setYLabel(this.chart1, newVal)
 			Chart.setYLabel(this.chart2, newVal)
 		}
+	}
+
+	// bar chart; please take note of comment on #resize().
+	setData1(cols, colorPalette, seriesLabels) {
+		Chart.init({
+			chartDOMElementId: this.chart1,
+			type: "line",
+			//legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+			cols: cols,
+			//fixColors: {...data.countryColors, ...data.indexColors},
+			fixColors:{
+				"Nationals, EU":"#0e47cb",				// mittelblau
+				"EU Citizens, EU":"#082b7a",			// dunkelblau
+				"Non EU Citizens, EU": "#388ae2"	// hellblau		TODO: go through seriesLabels
+			},
+			palette: colorPalette,
+			seriesLabels: seriesLabels,
+			//suffixText: "getTooltipSuffix()",
+			tooltipFn: this.#_tooltipExtFn1
+		})
+	}
+
+	// vertically connected dot plot (VCDP); please take note of comment on #resize().
+	setData2(cols, colorPalette, seriesLabels) {
+		Chart.init({
+			chartDOMElementId: this.chart2,
+			type: "line",
+			//legendDOMElementId: this.shadowRoot.getElementById("legend2"),
+			cols: cols,
+			//fixColors: {...data.countryColors, ...data.indexColors},
+			palette: colorPalette,
+			seriesLabels: seriesLabels,
+			//suffixText: "getTooltipSuffix()",
+			showLines:false,
+			tooltipFn: this.#_tooltipExtFn2
+		})
 	}
 
 	toggleExpansion(relativeTo) {
@@ -190,40 +239,6 @@ class Element extends HTMLElement {
 
 	}
 
-	// bar chart; please take note of comment on #resize().
-	setData1(cols, colorPalette, seriesLabels) {
-		//console.log(seriesLabels)
-		Chart.init({
-			type: "line",
-			chartDOMElementId: this.chart1,
-			//legendDOMElementId: this.shadowRoot.getElementById("legend1"),
-			cols: cols,
-			//fixColors: {...data.countryColors, ...data.indexColors},
-			fixColors:{
-				"Nationals, EU":"#0e47cb",				// mittelblau
-				"EU Citizens, EU":"#082b7a",			// dunkelblau
-				"Non EU Citizens, EU": "#388ae2"	// hellblau		TODO: go through seriesLabels
-			},
-			palette: colorPalette,
-			seriesLabels: seriesLabels,
-			//suffixText: "getTooltipSuffix()",
-		})
-	}
-
-	// vertically connected dot plot (VCDP); please take note of comment on #resize().
-	setData2(cols, colorPalette, seriesLabels) {
-		Chart.init({
-			type: "line",
-			chartDOMElementId: this.chart2,
-			//legendDOMElementId: this.shadowRoot.getElementById("legend2"),
-			cols: cols,
-			//fixColors: {...data.countryColors, ...data.indexColors},
-			palette: colorPalette,
-			seriesLabels: seriesLabels,
-			//suffixText: "getTooltipSuffix()",
-			showLines:false
-		})
-	}
 
 	// take care: billboard doesn't like to get fed data while resizing.
 	// it might lead to CPU overload and the site not responding to user input.

@@ -47,7 +47,7 @@ export default class MarkUpCode {
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
 			<center>
-			<img id="staticLegend" src="/img/static-legend.png" alt="legend"/>
+			<img id="staticLegend" src="./img/static-legend.png" alt="legend"/>
 			</center>
 
 			<div style="height:70%; position:relative;" id='chartContainer'>
