@@ -8,6 +8,7 @@ export default class MarkUpCode {
 	// the important is there because FF prefers a different value (per "best match")
 	static mainElements(title, w, h) { return `
 		<link rel="stylesheet" href="redist/billboard-3.4.1/billboard.min.css">
+		<link rel="stylesheet" href="./redist/ecl/ecl-eu.css" />
 
 		<style>
 		
@@ -21,13 +22,19 @@ export default class MarkUpCode {
 				border-color: #ecedf1;
 				overflow: hidden;
 				box-shadow: 1px 1px 4px 2px rgba(0,0,0,.08), inset 0 0 8px rgba(43,53,98,.18);
+				transition: box-shadow 0.4s;
 			}
 
-			.main:hover {
+			.main:hover, .main:focus {
         box-shadow: 2px 2px 6px 4px rgba(0,0,0,0.14), inset 0 0 10px rgba(5, 116, 173, 0.64);
+				transition: box-shadow 0.4s;
       }
 
 			.thick-line { stroke-width: 3.5px; }
+
+			#chart1 > svg {
+				margin-left:-25px;
+			}
 
 		</style>
 
@@ -46,23 +53,47 @@ export default class MarkUpCode {
 			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
-			<center>
-			<img id="staticLegend" src="./img/static-legend.png" alt="legend"/>
-			</center>
+			<center>	<img id="staticLegend" src="./img/static-legend.png" alt="legend"/>	 </center>
 
-			<div style="height:70%; position:relative;" id='chartContainer'>
+			<div style="height:70%; width:105%; position:relative;" id='chartContainer'>
 
-				<div style="top:0px; position:absolute; background:white;   display: flex; flex-direction: row; flex-wrap: wrap; width: 100%;  ">
-					<div id='chart1' style="display: flex; flex-direction: column; flex-basis: 100%; flex: 4;"></div>
-					<div style="height:10%;    display: flex; flex-direction: column; flex-basis: 100%; flex: 1; " id='legend1'></div>
+				<div style="top:0px; position:absolute; background:white; width: 95%; ">
+					<div id='chart1' style="height:80%;"></div>
+					<!--div style="height:10%;    display: flex; flex-direction: column; flex-basis: 100%; flex: 1; " id='legend1'></div-->
 				</div>
 				<div style="top:0px; position:absolute; background:white;">
-					<div style="height:10%;" id='legend2'></div>
+					<!--div style="height:10%;" id='legend2'></div-->
 					<div id='chart2'></div>
 				</div>
 	
 			</div>
 
+			<!--input type="timeSelect" min="-5" max="5" step="1.0" value="0" style="height:10%;"-->
+
+			<div id="bottomLine" style="display: none; grid-template-columns: 1fr 1fr 1fr;">
+				<!-- TODO: make this leftmost cell a slot -->
+				<div>
+					<div style="text-align: left; padding-left: 30px;">
+						<p>
+							<a href="https://ec.europa.eu/info/cookies_en?lang=en&amp;lang=en"><span tabindex="0">Cookies</span></a>
+							|
+							<a href="https://ec.europa.eu/info/privacy-policy_en?lang=en&amp;lang=en"><span tabindex="0">Privacy policy</span></a>
+							|
+							<a href="https://ec.europa.eu/info/legal-notice_en?lang=en&amp;lang=en"><span tabindex="0">Legal notice</span></a>
+						</p>
+					</div>
+				</div>
+
+				<p style="justify-self: center;"><a id="sourceLink"><span tabindex="0">Dataset Source</span></a></p>
+
+				<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:200px; justify-self: right; margin-right: 30px;">
+					<span class="ecl-button__label" data-ecl-label="true">Read the article</span>
+						<svg class="ecl-icon ecl-icon--xs ecl-icon--rotate-90 ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="">
+							<use xlink:href="../../redist/ecl/icons.svg#corner-arrow"></use>
+						</svg>
+				</button>
+				
+			</div>
 
 		</div>
 

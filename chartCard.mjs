@@ -20,6 +20,10 @@ class Element extends HTMLElement {
 	#_anchor
 	#_tooltipExtFn1
 	#_tooltipExtFn2
+	#_yLabel
+	#_srcLinkB
+	#_srcLinkC
+	#_articleLink
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -28,7 +32,9 @@ class Element extends HTMLElement {
 	constructor() {
 		super()
 		this.attachShadow({mode: 'open'})
-		const tmp = MarkUpCode.getHtmlTemplate(MarkUpCode.mainElements("No title", MS.width, MS.height)).cloneNode(true)
+		const tmp = MarkUpCode.getHtmlTemplate(
+				MarkUpCode.mainElements("No title", MS.width, MS.height)
+			).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
 		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
@@ -90,6 +96,11 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
+		this.#$("articleLink").addEventListener("click", (ev) => {
+			window.open(this.#_articleLink,"_self")
+			ev.stopPropagation()
+		})
+
 		this.#showChart1(true)
 	}
 
@@ -99,10 +110,11 @@ class Element extends HTMLElement {
 		const hidePos="1000px"
 		this.chart1.parentNode.style.top= show?showPos:hidePos
 		this.chart2.parentNode.style.top= !show?showPos:hidePos
+		this.#setLinks(show)
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel"]
+		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel", "srclinkc", "srclinkb", "articlelink", "infoText"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
@@ -116,9 +128,12 @@ class Element extends HTMLElement {
 				console.error("chartCard: not initialized yet")
 			}
 		}
-		if(name==="ylabel") {
-			Chart.setYLabel(this.chart1, newVal)
-			Chart.setYLabel(this.chart2, newVal)
+		if(name==="ylabel") {	this.#_yLabel = newVal }
+		if(name==="articlelink") { this.#_articleLink = newVal }
+		if(name==="srclinkb") { this.#_srcLinkB = newVal }
+		if(name==="srclinkc") {	this.#_srcLinkC = newVal }
+		if(name==="infotext") {
+			//TODO
 		}
 	}
 
@@ -140,6 +155,7 @@ class Element extends HTMLElement {
 			//suffixText: "getTooltipSuffix()",
 			tooltipFn: this.#_tooltipExtFn1
 		})
+		this.#setLinks(true)
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
@@ -156,6 +172,10 @@ class Element extends HTMLElement {
 			showLines:false,
 			tooltipFn: this.#_tooltipExtFn2
 		})
+	}
+
+	#setLinks(linkC) {
+		this.#$("sourceLink").setAttribute("href", linkC?this.#_srcLinkC:this.#_srcLinkB)
 	}
 
 	toggleExpansion(relativeTo) {
@@ -182,9 +202,14 @@ class Element extends HTMLElement {
 		sroot.style.position="fixed"
 		sroot.style.zIndex="1"
 
+		//div.style.transition="width 0.8s"
+		//div.style.transition="height 0.2s"
+		//this.chart1.firstElementChild.style.marginLeft=""
+		//console.log(this.chart1.firstElementChild)
+
 		div.style.position="fixed"
-		div.style.width="98.5%"
-		div.style.height= window.innerHeight - relativeTo.getBoundingClientRect().bottom - window.scrollY + 60 + "px"
+		div.style.width="99%"
+		div.style.height= window.innerHeight - relativeTo.getBoundingClientRect().bottom - window.scrollY + "px"
 		div.style.top="-10px"
 		div.style.left="-10px"
 		div.style.borderRadius=0
@@ -195,7 +220,12 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("staticLegend").style.display="none"
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
+		this.shadowRoot.getElementById("bottomLine").style.display="grid"
+		this.shadowRoot.getElementById("chartContainer").style.height="65%"
 		this.#_isExpanded = true
+
+		Chart.setYLabel(this.chart1, this.#_yLabel)
+		Chart.setYLabel(this.chart2, this.#_yLabel)
 
 		this.#resize(() => {
 			const event = new Event("expanding")
@@ -228,7 +258,12 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("staticLegend").style.display="block"
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
+		this.shadowRoot.getElementById("bottomLine").style.display="none"
+		this.shadowRoot.getElementById("chartContainer").style.height="70%"
 		this.#_isExpanded = false
+
+		Chart.setYLabel(this.chart1, null)
+		Chart.setYLabel(this.chart2, null)
 
 		this.#resize(() => {
 			this.#showChart1(true)
@@ -241,15 +276,15 @@ class Element extends HTMLElement {
 
 
 	// take care: billboard doesn't like to get fed data while resizing.
-	// it might lead to CPU overload and the site not responding to user input.
+	// it might lead to CPU overload and the site not responding to user input anymore.
 	#resize(callback) {
 		if(this && this.shadowRoot) {
 			const r = this.shadowRoot.getElementById("chartContainer")
 			if(this.chart1) {
-				Chart.resize(this.chart1, r.clientWidth, r.clientHeight*0.8)
+				Chart.resize(this.chart1, r.clientWidth-22, r.clientHeight)
 			}
 			if(this.chart2) {
-				Chart.resize(this.chart2, r.clientWidth, r.clientHeight*0.8, callback)
+				Chart.resize(this.chart2, r.clientWidth-22, r.clientHeight, callback)
 			}
 		}
 	}
