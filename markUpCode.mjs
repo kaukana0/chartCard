@@ -40,13 +40,12 @@ export default class MarkUpCode {
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
 
-			<symbol-button id="close" symbol="close" style="float:right; display:none;"></symbol-button>
+			<symbol-button id="close" symbol="close" style="float:right; display:none; margin-right:10px; margin-top:10px;"></symbol-button>
 
-			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slot1"></slot> </div>
-			<div id="switch" style="height:60px; text-align:right; display:none;">
-				<br><br>
-				<symbol-button id="switchTo1" symbol="lineChart" style="height: 70px; width: 70px; padding-right:15px;"></symbol-button>
-				<symbol-button id="switchTo2" symbol="barChart"  style="height: 70px; width: 70px;"></symbol-button>
+			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slotTop"></slot> </div>
+			<div id="switch" style="height:40px; text-align:right; display:none; margin-top:20px; margin-right:30px;">
+				<symbol-button id="switchTo1" symbol="lineChart" style="height: 25px; width: 25px; padding-right:20px;"></symbol-button>
+				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
 			</div>
 			<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
 			<div id="subtitle" style="height:5%;">Subtitle</div>
@@ -55,6 +54,7 @@ export default class MarkUpCode {
 
 			<center>	<img id="staticLegend" src="./img/static-legend.png" alt="legend"/>	 </center>
 
+			<!-- height modified per JS -->
 			<div style="height:70%; width:105%; position:relative;" id='chartContainer'>
 
 				<div style="top:0px; position:absolute; background:white; width: 95%; ">
@@ -68,20 +68,13 @@ export default class MarkUpCode {
 	
 			</div>
 
-			<!--input type="timeSelect" min="-5" max="5" step="1.0" value="0" style="height:10%;"-->
+			<div style="height: 20px; padding-top:20px; padding-left:30px; padding-right:30px;">
+				<slot name="slotBottom"></slot>
+			</div>
 
-			<div id="bottomLine" style="display: none; grid-template-columns: 1fr 1fr 1fr;">
-				<!-- TODO: make this leftmost cell a slot -->
+			<div id="bottomLine" style="display: none; height:40px; grid-template-columns: 1fr 1fr 1fr;">
 				<div>
-					<div style="text-align: left; padding-left: 30px;">
-						<p>
-							<a href="https://ec.europa.eu/info/cookies_en?lang=en&amp;lang=en"><span tabindex="0">Cookies</span></a>
-							|
-							<a href="https://ec.europa.eu/info/privacy-policy_en?lang=en&amp;lang=en"><span tabindex="0">Privacy policy</span></a>
-							|
-							<a href="https://ec.europa.eu/info/legal-notice_en?lang=en&amp;lang=en"><span tabindex="0">Legal notice</span></a>
-						</p>
-					</div>
+					<slot name="slotBottomLeft"></slot>
 				</div>
 
 				<p style="justify-self: center;"><a id="sourceLink"><span tabindex="0">Dataset Source</span></a></p>

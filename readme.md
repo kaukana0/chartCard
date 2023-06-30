@@ -6,7 +6,7 @@ Looks like this atm and is able to expand:
 
 ## notes
 
-- It features one slot for putting content into (the slot is named "slot1").
+- It features 3 slots for putting content into (top row, bottom row, bottom left).
 - The card isn't aware about the content - it makes no assumptions about what it is.
 - It's just responsible for positioning it in the card: a row below the subtitle.
 - It expands relative to the HTML element targetted via the "anchor" attribute.
@@ -15,7 +15,7 @@ Looks like this atm and is able to expand:
 
     <div>
       <chart-card id="myCard" anchor="anchorExpandedCard"> 
-        <div slot="slot1" style="height:50px; display:flex; justify-content: space-evenly; flex-grow:1;">
+        <div slot="slotTop" style="height:50px; display:flex; justify-content: space-evenly; flex-grow:1;">
           <a>some content</a>
           <a>more content</a>
         </div>

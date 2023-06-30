@@ -221,7 +221,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
-		this.shadowRoot.getElementById("chartContainer").style.height="65%"
+		this.shadowRoot.getElementById("chartContainer").style.height="60%"
 		this.#_isExpanded = true
 
 		Chart.setYLabel(this.chart1, this.#_yLabel)
