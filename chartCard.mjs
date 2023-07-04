@@ -59,9 +59,7 @@ class Element extends HTMLElement {
 
 	set tooltipFn1(val) {this.#_tooltipExtFn1 = val}
 	set tooltipFn2(val) {this.#_tooltipExtFn2 = val}
-	set tooltipCSS(val) { 
-		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(val)) 
-	}
+	set tooltipCSS(val) { this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(val)) }
 
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
@@ -144,7 +142,6 @@ class Element extends HTMLElement {
 			type: "line",
 			//legendDOMElementId: this.shadowRoot.getElementById("legend1"),
 			cols: cols,
-			//fixColors: {...data.countryColors, ...data.indexColors},
 			fixColors:{
 				"Nationals, EU":"#0e47cb",				// mittelblau
 				"EU Citizens, EU":"#082b7a",			// dunkelblau
@@ -153,6 +150,7 @@ class Element extends HTMLElement {
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
+			suffixText: "%",	// TODO
 			tooltipFn: this.#_tooltipExtFn1
 		})
 		this.#setLinks(true)
@@ -165,10 +163,15 @@ class Element extends HTMLElement {
 			type: "line",
 			//legendDOMElementId: this.shadowRoot.getElementById("legend2"),
 			cols: cols,
-			//fixColors: {...data.countryColors, ...data.indexColors},
+			fixColors:{
+				"NAT":"#734221",				// dunkel
+				"EU_FOR":"#c66914",			// mittel
+				"NEU_FOR": "#dfb18b"		// hell		TODO: EU different
+			},
 			palette: colorPalette,
 			seriesLabels: seriesLabels,
 			//suffixText: "getTooltipSuffix()",
+			suffixText: "%",	// TODO
 			showLines:false,
 			tooltipFn: this.#_tooltipExtFn2
 		})
