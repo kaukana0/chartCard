@@ -136,7 +136,7 @@ class Element extends HTMLElement {
 	}
 
 	// bar chart; please take note of comment on #resize().
-	setData1(cols, colorPalette, seriesLabels) {
+	setData1(cols, colorPalette, countryNamesFull) {
 		Chart.init({
 			chartDOMElementId: this.chart1,
 			type: "line",
@@ -148,7 +148,7 @@ class Element extends HTMLElement {
 				"Non EU Citizens, EU": "#388ae2"	// hellblau		TODO: go through seriesLabels
 			},
 			palette: colorPalette,
-			seriesLabels: seriesLabels,
+			seriesLabels: countryNamesFull,
 			//suffixText: "getTooltipSuffix()",
 			suffixText: "%",	// TODO
 			tooltipFn: this.#_tooltipExtFn1
@@ -157,7 +157,7 @@ class Element extends HTMLElement {
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
-	setData2(cols, colorPalette, seriesLabels) {
+	setData2(cols, colorPalette, countryNamesFull) {
 		Chart.init({
 			chartDOMElementId: this.chart2,
 			type: "line",
@@ -169,7 +169,7 @@ class Element extends HTMLElement {
 				"NEU_FOR": "#dfb18b"		// hell		TODO: EU different
 			},
 			palette: colorPalette,
-			seriesLabels: seriesLabels,
+			seriesLabels: countryNamesFull,
 			//suffixText: "getTooltipSuffix()",
 			suffixText: "%",	// TODO
 			showLines:false,
