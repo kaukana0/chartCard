@@ -136,18 +136,14 @@ class Element extends HTMLElement {
 	}
 
 	// bar chart; please take note of comment on #resize().
-	setData1(cols, colorPalette, countryNamesFull) {
+	setData1(cols, countryNamesFull, palette, fixColors) {
 		Chart.init({
 			chartDOMElementId: this.chart1,
 			type: "line",
 			//legendDOMElementId: this.shadowRoot.getElementById("legend1"),
 			cols: cols,
-			fixColors:{
-				"Nationals, EU":"#0e47cb",				// mittelblau
-				"EU Citizens, EU":"#082b7a",			// dunkelblau
-				"Non EU Citizens, EU": "#388ae2"	// hellblau		TODO: go through seriesLabels
-			},
-			palette: colorPalette,
+			palette: palette,
+			fixColors: fixColors,
 			seriesLabels: countryNamesFull,
 			//suffixText: "getTooltipSuffix()",
 			suffixText: "%",	// TODO
@@ -157,23 +153,20 @@ class Element extends HTMLElement {
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
-	setData2(cols, colorPalette, countryNamesFull) {
+	setData2(cols, countryNamesFull, palette, fixColors) {
 		Chart.init({
 			chartDOMElementId: this.chart2,
 			type: "line",
 			//legendDOMElementId: this.shadowRoot.getElementById("legend2"),
 			cols: cols,
-			fixColors:{
-				"NAT":"#734221",				// dunkel
-				"EU_FOR":"#c66914",			// mittel
-				"NEU_FOR": "#dfb18b"		// hell		TODO: EU different
-			},
-			palette: colorPalette,
+			palette: palette,
+			fixColors: fixColors,
 			seriesLabels: countryNamesFull,
 			//suffixText: "getTooltipSuffix()",
 			suffixText: "%",	// TODO
 			showLines:false,
-			tooltipFn: this.#_tooltipExtFn2
+			tooltipFn: this.#_tooltipExtFn2,
+			labelEveryTick: true
 		})
 	}
 
@@ -217,7 +210,9 @@ class Element extends HTMLElement {
 		div.style.left="-10px"
 		div.style.borderRadius=0
 
-		this.shadowRoot.getElementById("slotContainer").style.display="inline"
+		this.shadowRoot.getElementById("slotContainerTop").style.display="inline"
+		this.shadowRoot.getElementById("slotContainerBottom").style.display="inline"
+		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="inline"
 		this.shadowRoot.getElementById("close").style.display="inline"
 		this.shadowRoot.getElementById("switch").style.display="block"
 		this.shadowRoot.getElementById("staticLegend").style.display="none"
@@ -255,7 +250,9 @@ class Element extends HTMLElement {
 		div.style.zIndex=""
 		div.style.borderRadius=this.storedStyles.div.borderRadius
 
-		this.shadowRoot.getElementById("slotContainer").style.display="none"
+		this.shadowRoot.getElementById("slotContainerTop").style.display="none"
+		this.shadowRoot.getElementById("slotContainerBottom").style.display="none"
+		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="none"
 		this.shadowRoot.getElementById("close").style.display="none"
 		this.shadowRoot.getElementById("switch").style.display="none"
 		this.shadowRoot.getElementById("staticLegend").style.display="block"

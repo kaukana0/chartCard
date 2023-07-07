@@ -42,7 +42,7 @@ export default class MarkUpCode {
 
 			<symbol-button id="close" symbol="close" style="float:right; display:none; margin-right:10px; margin-top:10px;"></symbol-button>
 
-			<div id="slotContainer" style="display:none; margin:10px;"> <slot name="slotTop"></slot> </div>
+			<div id="slotContainerTop" style="display:none; margin:10px;"> <slot name="slotTop"></slot> </div>
 			<div id="switch" style="height:40px; text-align:right; display:none; margin-top:20px; margin-right:30px;">
 				<symbol-button id="switchTo1" symbol="lineChart" style="height: 25px; width: 25px; padding-right:20px;"></symbol-button>
 				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
@@ -68,12 +68,12 @@ export default class MarkUpCode {
 	
 			</div>
 
-			<div style="height: 20px; padding-top:20px; padding-left:30px; padding-right:30px;">
+			<div id="slotContainerBottom" style="height: 20px; padding-top:20px; padding-left:30px; padding-right:30px; display: none;">
 				<slot name="slotBottom"></slot>
 			</div>
 
 			<div id="bottomLine" style="display: none; height:40px; grid-template-columns: 1fr 1fr 1fr;">
-				<div>
+				<div id="slotContainerBottomLeft">
 					<slot name="slotBottomLeft"></slot>
 				</div>
 
