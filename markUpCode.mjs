@@ -6,7 +6,7 @@ all HTML and CSS as JS string
 export default class MarkUpCode {
 
 	// the important is there because FF prefers a different value (per "best match")
-	static mainElements(title, w, h) { return `
+	static mainElements(title, w, h, shift) { return `
 		<link rel="stylesheet" href="redist/billboard-3.4.1/billboard.min.css">
 		<link rel="stylesheet" href="./redist/ecl/ecl-eu.css" />
 
@@ -32,8 +32,9 @@ export default class MarkUpCode {
 
 			.thick-line { stroke-width: 3.5px; }
 
+
 			#chart1 > svg {
-				margin-left:-25px;
+				margin-left: -${shift}px;
 			}
 
 		</style>
@@ -42,8 +43,8 @@ export default class MarkUpCode {
 
 			<symbol-button id="close" symbol="close" style="float:right; display:none; margin-right:10px; margin-top:10px;"></symbol-button>
 
-			<div id="slotContainerTop" style="display:none; margin:10px;"> <slot name="slotTop"></slot> </div>
-			<div id="switch" style="height:40px; text-align:right; display:none; margin-top:20px; margin-right:30px;">
+			<div id="slotContainerTop" style="display:none; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
+			<div id="switch" style="height:20px; text-align:right; display:none; margin-top:20px; margin-right:30px;">
 				<symbol-button id="switchTo1" symbol="lineChart" style="height: 25px; width: 25px; padding-right:20px;"></symbol-button>
 				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
 			</div>
@@ -54,15 +55,14 @@ export default class MarkUpCode {
 
 			<center>	<img id="staticLegend" src="./img/static-legend.png" alt="legend"/>	 </center>
 
-			<!-- height modified per JS -->
-			<div style="height:70%; width:105%; position:relative;" id='chartContainer'>
+			<!-- height modified by JS -->
+			<div style="height:70%; width:100%; position:relative;" id='chartContainer'>
 
-				<div style="top:0px; position:absolute; background:white; width: 95%; ">
+				<div style="top:0px; display:flex; background:white;">
 					<div id='chart1' style="height:80%;"></div>
-					<!--div style="height:10%;    display: flex; flex-direction: column; flex-basis: 100%; flex: 1; " id='legend1'></div-->
+					<div style="display:none; height:80%; flex-direction: column; align-content: space-between;" id='legend1'></div>
 				</div>
 				<div style="top:0px; position:absolute; background:white;">
-					<!--div style="height:10%;" id='legend2'></div-->
 					<div id='chart2'></div>
 				</div>
 	
@@ -120,7 +120,22 @@ export default class MarkUpCode {
 			</style>`
 	}
 
-  	// helper
+	static legendCSS() {
+		return `
+		<style>
+		.bb-legend-item {
+			border-left: 25px solid;
+			margin-top:5px;
+			padding-top: 0.7em; 
+			padding-bottom: 0.7em; 
+			padding-left: 10px;
+			text-align: left;	/* left alignment when besides chart */
+		}
+		</style>
+		`
+	}
+
+	// helper
 	static getHtmlTemplate(source) {
 		const t = document.createElement('template')
 		t.innerHTML = source

@@ -10,7 +10,8 @@ import "../buttonX/button.mjs"
 // magic strings
 const MS = {
 	width: "420px",
-	height: "420px"
+	height: "420px",
+	shift: 25					// in overview, no y label is shown but space is claimed by billboardjs anyway
 }
 
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
@@ -33,13 +34,13 @@ class Element extends HTMLElement {
 		super()
 		this.attachShadow({mode: 'open'})
 		const tmp = MarkUpCode.getHtmlTemplate(
-				MarkUpCode.mainElements("No title", MS.width, MS.height)
+				MarkUpCode.mainElements("No title", MS.width, MS.height, MS.shift)
 			).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
 		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
 			// standard chart tooltip css; can be overwritten
-			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()
+			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()	+ MarkUpCode.legendCSS()
 		))
 		this.#_isExpanded = false
 		this.indicateLoading()
@@ -140,14 +141,15 @@ class Element extends HTMLElement {
 		Chart.init({
 			chartDOMElementId: this.chart1,
 			type: "line",
-			//legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+			legendDOMElementId: this.shadowRoot.getElementById("legend1"),
 			cols: cols,
 			palette: palette,
 			fixColors: fixColors,
 			seriesLabels: countryNamesFull,
 			//suffixText: "getTooltipSuffix()",
 			suffixText: "%",	// TODO
-			tooltipFn: this.#_tooltipExtFn1
+			tooltipFn: this.#_tooltipExtFn1,
+			onFinished: ()=>setTimeout(()=>this.#resize(true),50)
 		})
 		this.#setLinks(true)
 	}
@@ -157,7 +159,6 @@ class Element extends HTMLElement {
 		Chart.init({
 			chartDOMElementId: this.chart2,
 			type: "line",
-			//legendDOMElementId: this.shadowRoot.getElementById("legend2"),
 			cols: cols,
 			palette: palette,
 			fixColors: fixColors,
@@ -166,7 +167,8 @@ class Element extends HTMLElement {
 			suffixText: "%",	// TODO
 			showLines:false,
 			tooltipFn: this.#_tooltipExtFn2,
-			labelEveryTick: true
+			labelEveryTick: true,
+			onFinished: ()=>setTimeout(()=>this.#resize(false),50)
 		})
 	}
 
@@ -220,15 +222,21 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
 		this.shadowRoot.getElementById("chartContainer").style.height="60%"
+		this.shadowRoot.getElementById("legend1").style.display="flex"
+		this.shadowRoot.getElementById("chart1").style.width="95%"
+		this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
+
 		this.#_isExpanded = true
 
 		Chart.setYLabel(this.chart1, this.#_yLabel)
 		Chart.setYLabel(this.chart2, this.#_yLabel)
 
-		this.#resize(() => {
+		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
+		this.#resize(true, () => {
 			const event = new Event("expanding")
 			this.dispatchEvent(event)
-		})		
+		})
+		this.#resize(false)
 	}
 
 	contract() {
@@ -260,31 +268,37 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
 		this.shadowRoot.getElementById("chartContainer").style.height="70%"
+		this.shadowRoot.getElementById("legend1").style.display="none"
+		this.shadowRoot.getElementById("chart1").style.width="100%"
+		this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft=`-${MS.shift}px`
+
 		this.#_isExpanded = false
 
 		Chart.setYLabel(this.chart1, null)
 		Chart.setYLabel(this.chart2, null)
 
-		this.#resize(() => {
+		// TODO: let's see if it works well w/o Promises.all
+		this.#resize(true, () => {
 			this.#showChart1(true)
 	
 			const event = new Event("contracting")
 			this.dispatchEvent(event)
 		})
-
+		this.#resize(false)
 	}
 
 
 	// take care: billboard doesn't like to get fed data while resizing.
 	// it might lead to CPU overload and the site not responding to user input anymore.
-	#resize(callback) {
+	#resize(firstChart, callback) {
 		if(this && this.shadowRoot) {
 			const r = this.shadowRoot.getElementById("chartContainer")
-			if(this.chart1) {
-				Chart.resize(this.chart1, r.clientWidth-22, r.clientHeight)
+			if(firstChart && this.chart1) {
+				const s = this.#_isExpanded ? -150 : Number(MS.shift)
+				Chart.resize(this.chart1, r.clientWidth+s, r.clientHeight, callback)
 			}
-			if(this.chart2) {
-				Chart.resize(this.chart2, r.clientWidth-22, r.clientHeight, callback)
+			if(!firstChart && this.chart2) {
+				Chart.resize(this.chart2, r.clientWidth+Number(MS.shift), r.clientHeight, callback)
 			}
 		}
 	}
