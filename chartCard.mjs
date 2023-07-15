@@ -112,6 +112,18 @@ class Element extends HTMLElement {
 		this.#setLinks(show)
 	}
 
+	setLegendDotColors(threeColors) {
+		this.shadowRoot.getElementById("dot1").style.backgroundColor = threeColors[0]
+		this.shadowRoot.getElementById("dot2").style.backgroundColor = threeColors[1]
+		this.shadowRoot.getElementById("dot3").style.backgroundColor = threeColors[2]
+	}
+
+	setLegendTexts(threeTexts) {
+		this.shadowRoot.getElementById("statLegTxt1").textContent = threeTexts[0]
+		this.shadowRoot.getElementById("statLegTxt2").textContent = threeTexts[1]
+		this.shadowRoot.getElementById("statLegTxt3").textContent = threeTexts[2]
+	}
+
 	static get observedAttributes() {
 		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel", "srclinkc", "srclinkb", "articlelink", "infoText"]
 	}
@@ -217,14 +229,18 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="inline"
 		this.shadowRoot.getElementById("close").style.display="inline"
 		this.shadowRoot.getElementById("switch").style.display="block"
-		this.shadowRoot.getElementById("staticLegend").style.display="none"
+		this.shadowRoot.getElementById("contractedLegend").style.display="none"
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
 		this.shadowRoot.getElementById("chartContainer").style.height="60%"
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		this.shadowRoot.getElementById("chart1").style.width="95%"
-		this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
+		if(this.shadowRoot.querySelector("#chart1 > svg")) {
+			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
+		} else {
+			console.error("chartCard: no line chart")
+		}
 
 		this.#_isExpanded = true
 
@@ -263,14 +279,18 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="none"
 		this.shadowRoot.getElementById("close").style.display="none"
 		this.shadowRoot.getElementById("switch").style.display="none"
-		this.shadowRoot.getElementById("staticLegend").style.display="block"
+		this.shadowRoot.getElementById("contractedLegend").style.display="flex"
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
 		this.shadowRoot.getElementById("chartContainer").style.height="70%"
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		this.shadowRoot.getElementById("chart1").style.width="100%"
-		this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft=`-${MS.shift}px`
+		if(this.shadowRoot.querySelector("#chart1 > svg")) {
+			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft=`-${MS.shift}px`
+		} else {
+			console.error("chartCard: no line chart")
+		}
 
 		this.#_isExpanded = false
 

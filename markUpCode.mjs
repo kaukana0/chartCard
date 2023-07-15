@@ -37,6 +37,14 @@ export default class MarkUpCode {
 				margin-left: -${shift}px;
 			}
 
+			.dot {
+				height: 0.6rem;
+				width: 0.6rem;
+				background-color: #bbb;
+				border-radius: 50%;
+				display: inline-block;
+			}
+
 		</style>
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
@@ -53,14 +61,27 @@ export default class MarkUpCode {
 			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
-			<center>	<img id="staticLegend" src="./img/static-legend.png" alt="legend"/>	 </center>
+			<span id="contractedLegend" style="padding: 0px 30px 5px 30px; display:flex; justify-content:space-between;">
+				<span>
+					<span class="dot" id="dot1"></span>
+					<span id="statLegTxt1"></span>
+				</span>
+				<span style="margin: 0 7px 0 7px;">
+					<span class="dot" id="dot2"></span>
+					<span id="statLegTxt2"></span>
+				</span>
+				<span>
+					<span class="dot" id="dot3"></span>
+					<span id="statLegTxt3"></span>
+				</span>
+			</span>
 
 			<!-- height modified by JS -->
 			<div style="height:70%; width:100%; position:relative;" id='chartContainer'>
 
-				<div style="top:0px; display:flex; background:white;">
+				<div style="top:0px; display:flex; background:white; align-items:center;">
 					<div id='chart1' style="height:80%;"></div>
-					<div style="display:none; height:80%; flex-direction: column; align-content: space-between;" id='legend1'></div>
+					<div style="display:none; height:80%; flex-direction: column; justify-content: space-evenly;" id='legend1'></div>
 				</div>
 				<div style="top:0px; position:absolute; background:white;">
 					<div id='chart2'></div>
@@ -124,14 +145,19 @@ export default class MarkUpCode {
 		return `
 		<style>
 		.bb-legend-item {
-			border-left: 25px solid;
 			margin-top:5px;
 			padding-top: 0.7em; 
 			padding-bottom: 0.7em; 
-			padding-left: 10px;
+			padding-left: 2px;
 			text-align: left;	/* left alignment when besides chart */
 		}
-		</style>
+		.coloredDot {
+			display: inline-block;
+			height: 10px;
+			width: 10px;
+			border-radius: 5px;
+			}
+			</style>
 		`
 	}
 
