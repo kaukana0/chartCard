@@ -25,6 +25,9 @@ class Element extends HTMLElement {
 	#_srcLinkB
 	#_srcLinkC
 	#_articleLink
+	#_cardDims
+	#_isVisible
+	#_catchUp					// if data was set when invisible, catch up on setting data when it becomes visible
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -44,6 +47,9 @@ class Element extends HTMLElement {
 		))
 		this.#_isExpanded = false
 		this.indicateLoading()
+		this.#_cardDims = [this.style.width, this.style.height]
+		this.#_isVisible = true
+		this.#_catchUp = [null,null]
 	}
 
 	get chart1() {
@@ -56,6 +62,28 @@ class Element extends HTMLElement {
 
 	set anchor(val) {
 		this.setAttribute("anchor",val)
+	}
+
+	// billboard can't draw when display:none and moving out of doesn't always not work (e.g. if this card is used as a flex-item)
+	set isVisible(val) {
+		this.#_isVisible = val
+		if(val) {
+			this.style.width=this.#_cardDims[0]
+			this.style.height=this.#_cardDims[1]
+			this.style.visibility="visible"
+			if(this.#_catchUp[0]) {
+				this.setData1(this.#_catchUp[0]) 
+				this.#_catchUp[0] = null
+			}
+			if(this.#_catchUp[1]) {
+				this.setData2(this.#_catchUp[1]) 
+				this.#_catchUp[1] = null
+			}
+		} else {
+			this.style.visibility="hidden"
+			this.style.width="0"
+			this.style.height="0"
+		}
 	}
 
 	set tooltipFn1(val) {this.#_tooltipExtFn1 = val}
@@ -103,7 +131,7 @@ class Element extends HTMLElement {
 		this.#showChart1(true)
 	}
 
-	// billboard refuses to draw when hidden, so one solution is to move it out of sight
+	// billboard can't draw when display:none, so one solution is to move it out of sight
 	#showChart1(show) {
 		const showPos="0px"
 		const hidePos="1000px"
@@ -149,39 +177,47 @@ class Element extends HTMLElement {
 	}
 
 	// bar chart; please take note of comment on #resize().
-	setData1(cols, countryNamesFull, palette, fixColors) {
-		Chart.init({
-			chartDOMElementId: this.chart1,
-			type: "line",
-			legendDOMElementId: this.shadowRoot.getElementById("legend1"),
-			cols: cols,
-			palette: palette,
-			fixColors: fixColors,
-			seriesLabels: countryNamesFull,
-			//suffixText: "getTooltipSuffix()",
-			suffixText: "%",	// TODO
-			tooltipFn: this.#_tooltipExtFn1,
-			onFinished: ()=>setTimeout(()=>this.#resize(true),50)
-		})
-		this.#setLinks(true)
+	setData1(params) {
+		if(!this.#_isVisible) {
+			this.#_catchUp[0] = params
+		} else {
+			Chart.init({
+				chartDOMElementId: this.chart1,
+				type: "line",
+				legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+				cols: params.cols,
+				palette: params.palette,
+				fixColors: params.fixColors,
+				seriesLabels: params.countryNamesFull,
+				//suffixText: "getTooltipSuffix()",
+				suffixText: "%",	// TODO
+				tooltipFn: this.#_tooltipExtFn1,
+				onFinished: ()=>setTimeout(()=>this.#resize(true),50)
+			})
+			this.#setLinks(true)
+		}
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
-	setData2(cols, countryNamesFull, palette, fixColors) {
-		Chart.init({
-			chartDOMElementId: this.chart2,
-			type: "line",
-			cols: cols,
-			palette: palette,
-			fixColors: fixColors,
-			seriesLabels: countryNamesFull,
-			//suffixText: "getTooltipSuffix()",
-			suffixText: "%",	// TODO
-			showLines:false,
-			tooltipFn: this.#_tooltipExtFn2,
-			labelEveryTick: true,
-			onFinished: ()=>setTimeout(()=>this.#resize(false),50)
-		})
+	setData2(params) {
+		if(!this.#_isVisible) {
+			this.#_catchUp[1] = params
+		} else {
+			Chart.init({
+				chartDOMElementId: this.chart2,
+				type: "line",
+				cols: params.cols,
+				palette: params.palette,
+				fixColors: params.fixColors,
+				seriesLabels: params.countryNamesFull,
+				//suffixText: "getTooltipSuffix()",
+				suffixText: "%",	// TODO
+				showLines:false,
+				tooltipFn: this.#_tooltipExtFn2,
+				labelEveryTick: true,
+				onFinished: ()=>setTimeout(()=>this.#resize(false),50)
+			})
+		}
 	}
 
 	#setLinks(linkC) {
