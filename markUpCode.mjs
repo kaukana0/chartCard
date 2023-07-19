@@ -45,6 +45,19 @@ export default class MarkUpCode {
 				display: inline-block;
 			}
 
+/* TODO: this is project specific, move out of component */
+			.bb-line {
+				stroke-width: 3.5px;
+			}
+			
+			.bb-line-M{
+				stroke-dasharray: 5;
+			}
+			
+			.bb-line-EU--Non-EU-Born, .bb-line-EU--EU-Born, .bb-line-EU--Native-born, .bb-line-EU--Non-EU-Citizens, .bb-line-EU--EU-Citizens, .bb-line-EU--Nationals {
+				stroke-width: 4.5px;
+			}
+
 		</style>
 
 		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
@@ -57,7 +70,7 @@ export default class MarkUpCode {
 				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
 			</div>
 			<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
-			<div id="subtitle" style="height:5%;">Subtitle</div>
+			<div id="subtitle" style="height:5%; margin-left:3px;">Subtitle</div>
 			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
@@ -77,7 +90,7 @@ export default class MarkUpCode {
 			</span>
 
 			<!-- height modified by JS -->
-			<div style="height:70%; width:100%; position:relative;" id='chartContainer'>
+			<div style="height:60%; width:100%; position:relative;" id='chartContainer'>
 
 				<div style="top:0px; display:flex; background:white; align-items:center;">
 					<div id='chart1' style="height:80%;"></div>
@@ -98,7 +111,10 @@ export default class MarkUpCode {
 					<slot name="slotBottomLeft"></slot>
 				</div>
 
-				<p style="justify-self: center;"><a id="sourceLink"><span tabindex="0">Dataset Source</span></a></p>
+				<p style="justify-self: center;">
+					<a><span tabindex="0">Source: Eurostat - </span></a>
+					<a id="sourceLink"><span tabindex="0">access to dataset</span></a>
+				</p>
 
 				<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:200px; justify-self: right; margin-right: 30px;">
 					<span class="ecl-button__label" data-ecl-label="true">Read the article</span>
