@@ -22,8 +22,8 @@ class Element extends HTMLElement {
 	#_tooltipExtFn1
 	#_tooltipExtFn2
 	#_yLabel
-	#_srcLinkB
-	#_srcLinkC
+	#_srcLink1
+	#_srcLink2
 	#_articleLink
 	#_cardDims
 	#_isVisible
@@ -116,11 +116,17 @@ class Element extends HTMLElement {
 		this.#$("switchTo2").addEventListener("click", (ev) => {
 			this.#showChart1(false)
 			ev.stopPropagation()
+			const event = new Event("chartSwitched")
+			event["to"] = 2
+			this.dispatchEvent(event)
 		})
 
 		this.#$("switchTo1").addEventListener("click", (ev) => {
 			this.#showChart1(true)
 			ev.stopPropagation()
+			const event = new Event("chartSwitched")
+			event["to"] = 1
+			this.dispatchEvent(event)
 		})
 
 		this.#$("articleLink").addEventListener("click", (ev) => {
@@ -153,7 +159,7 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel", "srclinkc", "srclinkb", "articlelink", "infoText"]
+		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel", "srclink1", "srclink2", "articlelink", "infoText"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
@@ -169,8 +175,8 @@ class Element extends HTMLElement {
 		}
 		if(name==="ylabel") {	this.#_yLabel = newVal }
 		if(name==="articlelink") { this.#_articleLink = newVal }
-		if(name==="srclinkb") { this.#_srcLinkB = newVal }
-		if(name==="srclinkc") {	this.#_srcLinkC = newVal }
+		if(name==="srclink2") { this.#_srcLink2 = newVal }
+		if(name==="srclink1") {	this.#_srcLink1 = newVal }
 		if(name==="infotext") {
 			//TODO
 		}
@@ -221,7 +227,7 @@ class Element extends HTMLElement {
 	}
 
 	#setLinks(linkC) {
-		this.#$("sourceLink").setAttribute("href", linkC?this.#_srcLinkC:this.#_srcLinkB)
+		this.#$("sourceLink").setAttribute("href", linkC?this.#_srcLink1:this.#_srcLink2)
 	}
 
 	toggleExpansion(relativeTo) {
