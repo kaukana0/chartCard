@@ -116,6 +116,7 @@ class Element extends HTMLElement {
 		this.#$("switchTo2").addEventListener("click", (ev) => {
 			this.#showChart1(false)
 			ev.stopPropagation()
+			this.shadowRoot.getElementById("legend1").style.display="none"
 			const event = new Event("chartSwitched")
 			event["to"] = 2
 			this.dispatchEvent(event)
@@ -124,6 +125,7 @@ class Element extends HTMLElement {
 		this.#$("switchTo1").addEventListener("click", (ev) => {
 			this.#showChart1(true)
 			ev.stopPropagation()
+			this.shadowRoot.getElementById("legend1").style.display="flex"
 			const event = new Event("chartSwitched")
 			event["to"] = 1
 			this.dispatchEvent(event)
@@ -360,7 +362,7 @@ class Element extends HTMLElement {
 				Chart.resize(this.chart1, r.clientWidth+s, r.clientHeight, callback)
 			}
 			if(!firstChart && this.chart2) {
-				Chart.resize(this.chart2, r.clientWidth+Number(MS.shift), r.clientHeight, callback)
+				Chart.resize(this.chart2, r.clientWidth-Number(MS.shift), r.clientHeight, callback)
 			}
 		}
 	}
