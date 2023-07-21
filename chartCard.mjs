@@ -285,6 +285,8 @@ class Element extends HTMLElement {
 		} else {
 			console.error("chartCard: no line chart")
 		}
+		this.shadowRoot.getElementById("main").classList.remove("blueBorder")
+		this.shadowRoot.getElementById("info").style.display="inline"
 
 		this.#_isExpanded = true
 
@@ -335,6 +337,8 @@ class Element extends HTMLElement {
 		} else {
 			console.error("chartCard: no line chart")
 		}
+		this.shadowRoot.getElementById("main").classList.add("blueBorder")
+		this.shadowRoot.getElementById("info").style.display="none"
 
 		this.#_isExpanded = false
 

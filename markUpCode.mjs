@@ -16,16 +16,19 @@ export default class MarkUpCode {
 				width:${w};
 				height:${h};
 				margin:10px;
+				overflow: hidden;
+			}
+			
+			.blueBorder {
 				border-width: 2px;
 				border-style: solid;
 				border-radius: 5px;
 				border-color: #ecedf1;
-				overflow: hidden;
 				box-shadow: 1px 1px 4px 2px rgba(0,0,0,.08), inset 0 0 8px rgba(43,53,98,.18);
 				transition: box-shadow 0.4s;
 			}
 
-			.main:hover, .main:focus {
+			.blueBorder:hover, .blueBorder:focus {
         box-shadow: 2px 2px 6px 4px rgba(0,0,0,0.14), inset 0 0 10px rgba(5, 116, 173, 0.64);
 				transition: box-shadow 0.4s;
       }
@@ -60,7 +63,7 @@ export default class MarkUpCode {
 
 		</style>
 
-		<div tabindex="0" id="main" class="main" style="padding:10px; background-color:white;">
+		<div tabindex="0" id="main" class="main blueBorder" style="padding:10px; background-color:white;">
 
 			<symbol-button id="close" symbol="close" style="float:right; display:none; margin-right:10px; margin-top:10px;"></symbol-button>
 
@@ -69,7 +72,10 @@ export default class MarkUpCode {
 				<symbol-button id="switchTo1" symbol="lineChart" style="height: 25px; width: 25px; padding-right:20px;"></symbol-button>
 				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
 			</div>
-			<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
+			<div style="display:flex;">
+				<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
+				<symbol-button id="info" symbol="info" style="display:none; margin:-4px 0 0 5px;"></symbol-button>
+			</div>
 			<div id="subtitle" style="height:5%; margin-left:3px;">Subtitle</div>
 			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
