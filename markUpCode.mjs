@@ -76,16 +76,17 @@ export default class MarkUpCode {
 				<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
 				<symbol-button id="info" symbol="info" style="display:none; margin:-4px 0 0 5px;"></symbol-button>
 			</div>
-			<div id="subtitle" style="height:5%; margin-left:3px;">Subtitle</div>
+			<div id="subtitle_c" style="height:5%; margin-left:3px;">Subtitle</div>
+			<div id="subtitle_e" style="display:none; height:5%; margin-left:3px;">Subtitle</div>
 			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
-			<span id="contractedLegend" style="padding: 0px 30px 5px 30px; display:flex; justify-content:space-between;">
+			<span id="contractedLegend" style="margin-top:-15px; padding: 0px 30px 5px 30px; display:flex; flex-direction:column; justify-content:space-between; ">
 				<span>
 					<span class="dot" id="dot1"></span>
 					<span id="statLegTxt1"></span>
 				</span>
-				<span style="margin: 0 7px 0 7px;">
+				<span>
 					<span class="dot" id="dot2"></span>
 					<span id="statLegTxt2"></span>
 				</span>
@@ -96,7 +97,7 @@ export default class MarkUpCode {
 			</span>
 
 			<!-- height modified by JS -->
-			<div style="height:60%; width:100%; position:relative;" id='chartContainer'>
+			<div style="height:66%; width:100%; position:relative;" id='chartContainer'>
 
 				<div style="top:0px; display:flex; background:white; align-items:center;">
 					<div id='chart1' style="height:80%;"></div>

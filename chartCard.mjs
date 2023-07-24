@@ -60,6 +60,8 @@ class Element extends HTMLElement {
 		return this.shadowRoot.getElementById("chart2")
 	}
 
+	get isExpanded() { return this.#_isExpanded}
+
 	set anchor(val) {
 		this.setAttribute("anchor",val)
 	}
@@ -161,14 +163,14 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header", "subtitle", "right1", "right2", "ylabel", "srclink1", "srclink2", "articlelink", "infoText"]
+		return ["anchor", "header", "subtitle_e", "subtitle_c", "right1", "right2", "ylabel", "srclink1", "srclink2", "articlelink", "infoText"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		if(name==="anchor") {
 			this.#_anchor = newVal
 		}
-		if( "header subtitle right1 right2".includes(name) ) {
+		if( "header subtitle_e subtitle_c right1 right2".includes(name) ) {
 			if(this.shadowRoot.getElementById(name)) {
 				this.shadowRoot.getElementById(name).innerHTML = newVal
 			} else {
@@ -277,7 +279,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
-		this.shadowRoot.getElementById("chartContainer").style.height="60%"
+		//this.shadowRoot.getElementById("chartContainer").style.height="60%"
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		this.shadowRoot.getElementById("chart1").style.width="95%"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
@@ -287,6 +289,8 @@ class Element extends HTMLElement {
 		}
 		this.shadowRoot.getElementById("main").classList.remove("blueBorder")
 		this.shadowRoot.getElementById("info").style.display="inline"
+		this.shadowRoot.getElementById("subtitle_c").style.display="none"
+		this.shadowRoot.getElementById("subtitle_e").style.display="block"
 
 		this.#_isExpanded = true
 
@@ -329,7 +333,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
-		this.shadowRoot.getElementById("chartContainer").style.height="60%"		// when modifying this, also modify html in MarkUpCode
+		//this.shadowRoot.getElementById("chartContainer").style.height="60%"		// when modifying this, also modify html in MarkUpCode
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		this.shadowRoot.getElementById("chart1").style.width="100%"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
@@ -339,6 +343,8 @@ class Element extends HTMLElement {
 		}
 		this.shadowRoot.getElementById("main").classList.add("blueBorder")
 		this.shadowRoot.getElementById("info").style.display="none"
+		this.shadowRoot.getElementById("subtitle_c").style.display="block"
+		this.shadowRoot.getElementById("subtitle_e").style.display="none"
 
 		this.#_isExpanded = false
 
