@@ -283,7 +283,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
-		//this.shadowRoot.getElementById("chartContainer").style.height="60%"
+		this.shadowRoot.getElementById("chartContainer").style.height="60%"
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		this.shadowRoot.getElementById("chart1").style.width="95%"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
@@ -337,7 +337,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
-		//this.shadowRoot.getElementById("chartContainer").style.height="60%"		// when modifying this, also modify html in MarkUpCode
+		this.shadowRoot.getElementById("chartContainer").style.height="66%"		// when modifying this, also modify html in MarkUpCode
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		this.shadowRoot.getElementById("chart1").style.width="100%"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
