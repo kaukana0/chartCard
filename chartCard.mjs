@@ -28,6 +28,7 @@ class Element extends HTMLElement {
 	#_cardDims
 	#_isVisible
 	#_catchUp					// if data was set when invisible, catch up on setting data when it becomes visible
+	#_userData				// possibility to associate some info to a card. not used by the card itself for anything.
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -91,6 +92,9 @@ class Element extends HTMLElement {
 	set tooltipFn1(val) {this.#_tooltipExtFn1 = val}
 	set tooltipFn2(val) {this.#_tooltipExtFn2 = val}
 	set tooltipCSS(val) { this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(val)) }
+
+	set userData(val) {this.#_userData = val}
+	get userData() {return this.#_userData}
 
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
