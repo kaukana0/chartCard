@@ -54,6 +54,28 @@ class Element extends HTMLElement {
 		this.#_catchUp = [null,null]
 	}
 
+	someTestCode() {
+		setTimeout(()=>
+		{
+			//bb-chart-line bb-target bb-target-EU--Non-EU-Citizens bb-focused
+			this.shadowRoot.querySelectorAll(".bb-chart-line")
+			.forEach( e => {
+
+				e.style.pointerEvents=""
+
+
+				e.addEventListener("mouseover", e2 => {
+						console.log(e2.target.getAttribute("class"))
+				})
+
+				console.log(e)
+			})
+		
+		
+		}
+		,4000)		
+	}
+
 	get chart1() {
 		return this.shadowRoot.getElementById("chart1")
 	}
@@ -124,7 +146,7 @@ class Element extends HTMLElement {
 			this.#showChart1(false)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
-			Legend.resetCounter(2)
+			Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset swicth to 2", this.getAttribute("id"))
 
 			const event = new Event("chartSwitched")
 			event["to"] = 2
@@ -135,7 +157,7 @@ class Element extends HTMLElement {
 			this.#showChart1(true)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
-			Legend.resetCounter(2)
+			Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset swicth to 1", this.getAttribute("id"))
 
 			const event = new Event("chartSwitched")
 			event["to"] = 1
@@ -215,7 +237,7 @@ class Element extends HTMLElement {
 			})
 			this.#setLinks(true)
 		}
-		Legend.resetCounter(2)
+		Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset setData", this.getAttribute("id"))
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
@@ -306,7 +328,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, this.#_yLabel)
 		Chart.setYLabel(this.chart2, this.#_yLabel)
 
-		Legend.resetCounter()
+		Legend.resetCounter(Chart.getUniqueId(this.chart1)); //console.log("Reset expand", this.getAttribute("id"))
 
 		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
 		this.#resize(true, () => {
@@ -361,7 +383,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, null)
 		Chart.setYLabel(this.chart2, null)
 
-		Legend.resetCounter()
+		Legend.resetCounter(Chart.getUniqueId(this.chart1)); //console.log("Reset contract", this.getAttribute("id"))
 
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
