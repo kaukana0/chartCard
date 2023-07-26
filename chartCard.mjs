@@ -4,6 +4,7 @@ import * as Chart from "../chart/chart.mjs"
 import * as ChartGrid from "../chart/grid.mjs"
 import * as ChartAxis from "../chart/axis.mjs"
 import * as ChartTooltip from "../chart/tooltip.mjs"
+import * as Legend from "../../components/chart/legend.mjs"
 
 import "../buttonX/button.mjs"
 
@@ -123,6 +124,8 @@ class Element extends HTMLElement {
 			this.#showChart1(false)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
+			Legend.resetCounter(2)
+
 			const event = new Event("chartSwitched")
 			event["to"] = 2
 			this.dispatchEvent(event)
@@ -132,6 +135,8 @@ class Element extends HTMLElement {
 			this.#showChart1(true)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
+			Legend.resetCounter(2)
+
 			const event = new Event("chartSwitched")
 			event["to"] = 1
 			this.dispatchEvent(event)
@@ -210,6 +215,7 @@ class Element extends HTMLElement {
 			})
 			this.#setLinks(true)
 		}
+		Legend.resetCounter(2)
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
@@ -285,7 +291,6 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
 		this.shadowRoot.getElementById("chartContainer").style.height="60%"
 		this.shadowRoot.getElementById("legend1").style.display="flex"
-		this.shadowRoot.getElementById("chart1").style.width="95%"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
 		} else {
@@ -300,6 +305,8 @@ class Element extends HTMLElement {
 
 		Chart.setYLabel(this.chart1, this.#_yLabel)
 		Chart.setYLabel(this.chart2, this.#_yLabel)
+
+		Legend.resetCounter()
 
 		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
 		this.#resize(true, () => {
@@ -339,7 +346,6 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
 		this.shadowRoot.getElementById("chartContainer").style.height="66%"		// when modifying this, also modify html in MarkUpCode
 		this.shadowRoot.getElementById("legend1").style.display="none"
-		this.shadowRoot.getElementById("chart1").style.width="100%"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft=`-${MS.shift}px`
 		} else {
@@ -354,6 +360,8 @@ class Element extends HTMLElement {
 
 		Chart.setYLabel(this.chart1, null)
 		Chart.setYLabel(this.chart2, null)
+
+		Legend.resetCounter()
 
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
@@ -372,7 +380,7 @@ class Element extends HTMLElement {
 		if(this && this.shadowRoot) {
 			const r = this.shadowRoot.getElementById("chartContainer")
 			if(firstChart && this.chart1) {
-				const s = this.#_isExpanded ? -150 : Number(MS.shift)
+				const s = this.#_isExpanded ? -100 : Number(MS.shift)
 				Chart.resize(this.chart1, r.clientWidth+s, r.clientHeight, callback)
 			}
 			if(!firstChart && this.chart2) {

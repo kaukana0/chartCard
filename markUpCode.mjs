@@ -99,9 +99,9 @@ export default class MarkUpCode {
 			<!-- height modified by JS -->
 			<div style="height:66%; width:100%; position:relative;" id='chartContainer'>
 
-				<div style="top:0px; display:flex; background:white; align-items:center;">
-					<div id='chart1' style="height:80%;"></div>
-					<div style="display:none; height:80%; flex-direction: column; justify-content: space-evenly;" id='legend1'></div>
+				<div style="top:0px; display:flex; background:white;">
+					<div id='chart1' style="flex-grow:1;"></div>
+					<div style="display:none; flex-direction: column; justify-content: flex-start; margin: 10px 50px 0 0" id='legend1'></div>
 				</div>
 				<div style="top:0px; position:absolute; background:white;">
 					<div id='chart2'></div>
@@ -169,16 +169,18 @@ export default class MarkUpCode {
 		<style>
 		.bb-legend-item {
 			margin-top:5px;
-			padding-top: 0.7em; 
-			padding-bottom: 0.7em; 
+			padding-top: 0.1em; 
+			padding-bottom: 0.1em; 
 			padding-left: 2px;
 			text-align: left;	/* left alignment when besides chart */
+			font-family: Arial,sans-serif;
+			font-size: 15px;
 		}
 		.coloredDot {
 			display: inline-block;
-			height: 10px;
-			width: 10px;
-			border-radius: 5px;
+			height: 24px;
+			width: 24px;
+			border-radius: 12px;
 			}
 			</style>
 		`
