@@ -39,7 +39,7 @@ class Element extends HTMLElement {
 		super()
 		this.attachShadow({mode: 'open'})
 		const tmp = MarkUpCode.getHtmlTemplate(
-				MarkUpCode.mainElements("No title", MS.width, MS.height, MS.shift)
+				MarkUpCode.mainElements("No title", "No title", MS.width, MS.height, MS.shift)
 			).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
@@ -194,14 +194,14 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header", "subtitle_e", "subtitle_c", "right1", "right2", "ylabel", "srclink1", "srclink2", "articlelink", "infoText"]
+		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "ylabel", "srclink1", "srclink2", "articlelink", "infoText"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
 		if(name==="anchor") {
 			this.#_anchor = newVal
 		}
-		if( "header subtitle_e subtitle_c right1 right2".includes(name) ) {
+		if( "header_c header_e subtitle_e subtitle_c right1 right2".includes(name) ) {
 			if(this.shadowRoot.getElementById(name)) {
 				this.shadowRoot.getElementById(name).innerHTML = newVal
 			} else {
@@ -325,6 +325,8 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("info").style.display="inline"
 		this.shadowRoot.getElementById("subtitle_c").style.display="none"
 		this.shadowRoot.getElementById("subtitle_e").style.display="block"
+		this.shadowRoot.getElementById("header_c").style.display="none"
+		this.shadowRoot.getElementById("header_e").style.display="block"
 
 		this.#_isExpanded = true
 
@@ -380,6 +382,8 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("info").style.display="none"
 		this.shadowRoot.getElementById("subtitle_c").style.display="block"
 		this.shadowRoot.getElementById("subtitle_e").style.display="none"
+		this.shadowRoot.getElementById("header_c").style.display="block"
+		this.shadowRoot.getElementById("header_e").style.display="none"
 
 		this.#_isExpanded = false
 
@@ -418,8 +422,8 @@ class Element extends HTMLElement {
 	// TODO: this belongs to chart really, not to chartCard
 	drawVerticalLines() {
 
-		const x = this.shadowRoot.querySelector("#verticalLines")
-		if(x) x.remove()
+		const node = this.shadowRoot.querySelector("#verticalLines")
+		if(node) node.remove()
 
 		const [neu,eu,nat] = getDots(this.shadowRoot)
 
@@ -444,22 +448,29 @@ class Element extends HTMLElement {
 		const offsetX = Number(6)
 		const offsetY = Number(5)
 	
-		for(let i=0; i<neu.length; i++) {		
-			const x = Number(neu[i].getAttribute("x"))
+		for(let i=0; i<neu.length; i++) {
+			const x = getX(
+				Number(neu[i].getAttribute("x")),
+				Number(eu[i].getAttribute("x")),
+				Number(nat[i].getAttribute("x"))
+			)
 			if(x<=0) {continue}
+
 			const [ymi,yma] = getMinMax(
 				Number(neu[i].getAttribute("y")), 
 				Number(eu[i].getAttribute("y")), 
 				Number(nat[i].getAttribute("y"))
 			)
+			
+			//console.log(neu[i].getAttribute("class").slice(-4), x,ymi,yma)
 
 			const l = document.createElementNS("http://www.w3.org/2000/svg", "line")
 			l.setAttribute("x1", x+offsetX)
 			l.setAttribute("y1", ymi+offsetY)
 			l.setAttribute("x2", x+offsetX)
 			l.setAttribute("y2", yma+offsetY)
-			l.setAttribute("stroke", "#7fffd4")
-			l.setAttribute("stroke-width", "1")
+			l.setAttribute("style", "stroke: #CCC")
+			l.setAttribute("stroke-width", "2")
 
 			g.appendChild(l)
 		}
@@ -486,10 +497,25 @@ class Element extends HTMLElement {
 
 		}
 	
+		function getX(a,b,c) {
+			let zeros=0
+			if(a===0) zeros++
+			if(b===0) zeros++
+			if(c===0) zeros++
+			if(zeros>1) {
+				return -1
+			} else {
+				let x = a
+				if(x===0) {x=b}
+				if(x===0) {x=c}
+				return x
+			}
+		}
+
 		function getMinMax(a,b,c) {
 			if(a===0) { a=b }	// avoid 0 in case of <3 points
 			if(b===0) { b=c }
-			if(c===0) { console.debug("chartCard: dot plot all values 0") }
+			if(c===0) { c=a }
 
 			const min = (a<b?a:b) < c ? (a<b?a:b) : c
 			const max = (a>b?a:b) > c ? (a>b?a:b) : c

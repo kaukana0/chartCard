@@ -6,7 +6,7 @@ all HTML and CSS as JS string
 export default class MarkUpCode {
 
 	// the important is there because FF prefers a different value (per "best match")
-	static mainElements(title, w, h, shift) { return `
+	static mainElements(title, titleLong, w, h, shift) { return `
 		<link rel="stylesheet" href="redist/billboard-3.4.1/billboard.min.css">
 		<link rel="stylesheet" href="./redist/ecl/ecl-eu.css" />
 
@@ -73,7 +73,8 @@ export default class MarkUpCode {
 				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
 			</div>
 			<div style="display:flex;">
-				<h2 id="header" style="height:auto; margin:3px;">${title}</h2>
+				<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
+				<h2 id="header_e" style="display:none; height:auto; margin:3px;">${titleLong}</h2>
 				<symbol-button id="info" symbol="info" style="display:none; margin:-4px 0 0 5px;"></symbol-button>
 			</div>
 			<div id="subtitle_c" style="height:5%; margin-left:3px;">Subtitle</div>
@@ -168,9 +169,9 @@ export default class MarkUpCode {
 		return `
 		<style>
 		.bb-legend-item {
-			margin-top:5px;
-			padding-top: 0.1em; 
-			padding-bottom: 0.1em; 
+			margin-top:2px;
+			/*padding-top: 0.1em; 
+			padding-bottom: 0.1em; */
 			padding-left: 2px;
 			text-align: left;	/* left alignment when besides chart */
 			font-family: Arial,sans-serif;
