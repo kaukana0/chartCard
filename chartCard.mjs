@@ -259,7 +259,8 @@ class Element extends HTMLElement {
 				labelEveryTick: true,
 				onFinished: () => setTimeout(
 					()=>this.#resize(false, () => {this.drawVerticalLines()})
-				,50)
+				,50),
+				xAxisLabelBetween:false
 			})
 		}
 	}
