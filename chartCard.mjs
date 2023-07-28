@@ -217,6 +217,14 @@ class Element extends HTMLElement {
 		}
 	}
 
+	#getSuffix() {
+		if(this.#_yLabel.length===1) {
+			return this.#_yLabel
+		} else {
+			return " " + this.#_yLabel
+		}
+	}
+
 	// bar chart; please take note of comment on #resize().
 	setData1(params) {
 		if(!this.#_isVisible) {
@@ -230,8 +238,7 @@ class Element extends HTMLElement {
 				palette: params.palette,
 				fixColors: params.fixColors,
 				seriesLabels: params.countryNamesFull,
-				//suffixText: "getTooltipSuffix()",
-				suffixText: "%",	// TODO
+				suffixText: this.#getSuffix(),	// TODO: introduce new attribute for this if needed
 				tooltipFn: this.#_tooltipExtFn1,
 				onFinished: ()=>setTimeout(()=>this.#resize(true),50)
 			})
@@ -252,8 +259,7 @@ class Element extends HTMLElement {
 				palette: params.palette,
 				fixColors: params.fixColors,
 				seriesLabels: params.countryNamesFull,
-				//suffixText: "getTooltipSuffix()",
-				suffixText: "%",	// TODO
+				suffixText: this.#_yLabel,	// TODO: introduce new attribute for this if needed
 				showLines:false,
 				tooltipFn: this.#_tooltipExtFn2,
 				labelEveryTick: true,
