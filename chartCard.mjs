@@ -240,7 +240,7 @@ class Element extends HTMLElement {
 				seriesLabels: params.countryNamesFull,
 				suffixText: this.#getSuffix(),	// TODO: introduce new attribute for this if needed
 				tooltipFn: this.#_tooltipExtFn1,
-				onFinished: ()=>setTimeout(()=>this.#resize(true),50)
+				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50)
 			})
 			this.#setLinks(true)
 		}
@@ -259,7 +259,7 @@ class Element extends HTMLElement {
 				palette: params.palette,
 				fixColors: params.fixColors,
 				seriesLabels: params.countryNamesFull,
-				suffixText: this.#_yLabel,	// TODO: introduce new attribute for this if needed
+				suffixText: this.#getSuffix(),	// TODO: introduce new attribute for this if needed
 				showLines:false,
 				tooltipFn: this.#_tooltipExtFn2,
 				labelEveryTick: true,
@@ -527,9 +527,43 @@ class Element extends HTMLElement {
 			const max = (a>b?a:b) > c ? (a>b?a:b) : c
 			return [min,max]
 		}
-
 	}
 
+	// :-/
+	addMultiLineFocus() {
+		const that = this
+
+		const lines = this.shadowRoot.querySelector("#chart1 > svg  g.bb-chart-lines")
+		for(let i=0; i<lines.children.length; i++) {
+			lines.children[i].style.pointerEvents=""
+			const focus_pa = focus.bind(this,lines.children[i])
+			lines.children[i].addEventListener('mouseover', focus_pa)
+			lines.children[i].addEventListener('mouseout', defocus)
+		}
+
+		function focus(svgEl) {
+			let iAm
+			svgEl.classList.forEach(e=>{
+				if(e.startsWith("bb-target-")) {
+					iAm=e
+				}
+			})
+			const groupFindSubstring = iAm.substring(0,iAm.indexOf("--"))
+			const groupLines = this.shadowRoot.querySelectorAll(`#chart1 > svg  g.bb-chart-lines [class*=${groupFindSubstring}]`)
+			const foc = []
+			for(let j=0;j<groupLines.length;j++) {
+				groupLines[j].children[0].children[0].classList.forEach(e=>{
+					const bli = groupFindSubstring.replace("target","line")
+					if(e.startsWith(bli)) {
+						foc.push(e.replace("--",", ").replace("-"," ").replace("target","line").slice(8))
+					}
+				})
+			}
+			Chart.focus(that.chart1, foc)
+		}
+
+		function defocus() { Chart.focus(that.chart1) }
+	}
 
 	indicateLoading() {
 		this.shadowRoot.getElementById("main").classList.add("loading")

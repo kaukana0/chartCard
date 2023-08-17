@@ -48,17 +48,17 @@ export default class MarkUpCode {
 				display: inline-block;
 			}
 
-/* TODO: this is project specific, move out of component */
-			.bb-line {
-				stroke-width: 3.5px;
+			#chart1 > svg .bb-line {
+				stroke-width: 3.5px !important;
 			}
 			
 			.bb-line-M{
 				stroke-dasharray: 5;
 			}
-			
-			.bb-line-EU--Non-EU-Born, .bb-line-EU--EU-Born, .bb-line-EU--Native-born, .bb-line-EU--Non-EU-Citizens, .bb-line-EU--EU-Citizens, .bb-line-EU--Nationals {
-				stroke-width: 4.5px;
+
+			#chart1 > svg  [class*="bb-line-EU"]
+			{
+				stroke-width: 4.5px !important;
 			}
 
 		</style>
