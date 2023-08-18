@@ -30,6 +30,7 @@ class Element extends HTMLElement {
 	#_isVisible
 	#_catchUp					// if data was set when invisible, catch up on setting data when it becomes visible
 	#_userData				// possibility to associate some info to a card. not used by the card itself for anything.
+	#_lineHoverCallback
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -118,6 +119,8 @@ class Element extends HTMLElement {
 
 	set userData(val) {this.#_userData = val}
 	get userData() {return this.#_userData}
+
+	set lineHoverCallback(val) {this.#_lineHoverCallback = val}
 
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
@@ -225,7 +228,8 @@ class Element extends HTMLElement {
 		}
 	}
 
-	// bar chart; please take note of comment on #resize().
+	// line chart; please take note of comment on #resize().
+	// TODO: A ChartCard shouldn't make assumptions about what types of charts it has. Big refactoring neccessary for that.
 	setData1(params) {
 		if(!this.#_isVisible) {
 			this.#_catchUp[0] = params
@@ -234,6 +238,7 @@ class Element extends HTMLElement {
 				chartDOMElementId: this.chart1,
 				type: "line",
 				legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+				legendBehaviour: "hover",
 				cols: params.cols,
 				palette: params.palette,
 				fixColors: params.fixColors,
@@ -424,20 +429,14 @@ class Element extends HTMLElement {
 		}
 	}
 
-
-	// TODO: this belongs to chart really, not to chartCard
+	// TODO: this functionality belongs to chart really, not to chartCard.
+	// TODO: This is project specific (even contains magic strings) - it has to be generalized. Please see also comment for setData1().
 	drawVerticalLines() {
 
 		const node = this.shadowRoot.querySelector("#verticalLines")
 		if(node) node.remove()
 
 		const [neu,eu,nat] = getDots(this.shadowRoot)
-
-		//const out = this.shadowRoot.querySelgetDotsector("#chart2  .bb-chart-lines")
-		//const out = this.shadowRoot.querySelector("#chart2 > svg > g > g.bb-chart > g.bb-chart-lines")
-		//const out = this.shadowRoot.querySelector("#chart2 > svg > g.bb-main > g.bb-chart")
-		const out = this.shadowRoot.querySelector("#chart2 > svg  g.bb-chart-lines")
-
 		
 		if( neu.length!==eu.length || neu.length!==nat.length ) {
 			if(neu.length===0 || eu.length===0 || nat.length!==0) {
@@ -468,8 +467,6 @@ class Element extends HTMLElement {
 				Number(nat[i].getAttribute("y"))
 			)
 			
-			//console.log(neu[i].getAttribute("class").slice(-4), x,ymi,yma)
-
 			const l = document.createElementNS("http://www.w3.org/2000/svg", "line")
 			l.setAttribute("x1", x+offsetX)
 			l.setAttribute("y1", ymi+offsetY)
@@ -481,6 +478,7 @@ class Element extends HTMLElement {
 			g.appendChild(l)
 		}
 
+		const out = this.shadowRoot.querySelector("#chart2 > svg  g.bb-chart-lines")
 		out.insertAdjacentElement("afterbegin", g)	// behind the dots
 
 		function getDots(root) {
@@ -529,19 +527,21 @@ class Element extends HTMLElement {
 		}
 	}
 
-	// :-/
+	// see also adr13.md
 	addMultiLineFocus() {
 		const that = this
 
 		const lines = this.shadowRoot.querySelector("#chart1 > svg  g.bb-chart-lines")
 		for(let i=0; i<lines.children.length; i++) {
-			lines.children[i].style.pointerEvents=""
+			lines.children[i].style.pointerEvents="visibleStroke"		// see comment for passEventAlong()
 			const focus_pa = focus.bind(this,lines.children[i])
 			lines.children[i].addEventListener('mouseover', focus_pa)
 			lines.children[i].addEventListener('mouseout', defocus)
+			lines.children[i].addEventListener('mousemove', e=>passEventAlong(e))
 		}
 
-		function focus(svgEl) {
+		function focus(svgEl,e) {
+
 			let iAm
 			svgEl.classList.forEach(e=>{
 				if(e.startsWith("bb-target-")) {
@@ -550,19 +550,29 @@ class Element extends HTMLElement {
 			})
 			const groupFindSubstring = iAm.substring(0,iAm.indexOf("--"))
 			const groupLines = this.shadowRoot.querySelectorAll(`#chart1 > svg  g.bb-chart-lines [class*=${groupFindSubstring}]`)
-			const foc = []
+			const focusElementIds = []
 			for(let j=0;j<groupLines.length;j++) {
 				groupLines[j].children[0].children[0].classList.forEach(e=>{
 					const bli = groupFindSubstring.replace("target","line")
 					if(e.startsWith(bli)) {
-						foc.push(e.replace("--",", ").replace("-"," ").replace("target","line").slice(8))
+						focusElementIds.push(e.replaceAll("--",", ").replaceAll("-"," ").replaceAll("target","line").slice(8))
 					}
 				})
 			}
-			Chart.focus(that.chart1, foc)
+			Chart.focus(that.chart1, focusElementIds)
+			if(this.#_lineHoverCallback) {this.#_lineHoverCallback(focusElementIds)}
+			passEventAlong(e)
 		}
 
-		function defocus() { Chart.focus(that.chart1) }
+		function defocus(e) { Chart.focus(that.chart1); that.#_lineHoverCallback([]); passEventAlong(e) }
+
+		// caveat: setting pointerEvents (to not "none") on lines enables us to handle events.
+		// but the event doesn't get propagated further to elements which are visually behind/below the lines.
+		// why? because the lines are not DOM children of the element handling the tooltip. they're merely drawn on top visually.
+		// so, do it manually :-o
+		function passEventAlong(e) {		// to the "visual parent"
+			that.shadowRoot.querySelector(`#chart1 .bb-event-rect`).dispatchEvent( new e.constructor(e.type, e) )
+		}
 	}
 
 	indicateLoading() {
