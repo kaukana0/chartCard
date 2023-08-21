@@ -12,7 +12,8 @@ import "../buttonX/button.mjs"
 const MS = {
 	width: "380px",
 	height: "380px",
-	shift: 25					// in overview, no y label is shown but space is claimed by billboardjs anyway
+	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
+	SVG_el_prefix: "bb-target-"
 }
 
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
@@ -53,28 +54,6 @@ class Element extends HTMLElement {
 		this.#_cardDims = [this.style.width, this.style.height]
 		this.#_isVisible = true
 		this.#_catchUp = [null,null]
-	}
-
-	someTestCode() {
-		setTimeout(()=>
-		{
-			//bb-chart-line bb-target bb-target-EU--Non-EU-Citizens bb-focused
-			this.shadowRoot.querySelectorAll(".bb-chart-line")
-			.forEach( e => {
-
-				e.style.pointerEvents=""
-
-
-				e.addEventListener("mouseover", e2 => {
-						console.log(e2.target.getAttribute("class"))
-				})
-
-				console.log(e)
-			})
-		
-		
-		}
-		,4000)		
 	}
 
 	get chart1() {
@@ -245,7 +224,10 @@ class Element extends HTMLElement {
 				seriesLabels: params.countryNamesFull,
 				suffixText: this.#getSuffix(),	// TODO: introduce new attribute for this if needed
 				tooltipFn: this.#_tooltipExtFn1,
-				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50)
+				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50),
+				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
+					e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
+				)}
 			})
 			this.#setLinks(true)
 		}
@@ -541,25 +523,15 @@ class Element extends HTMLElement {
 		}
 
 		function focus(svgEl,e) {
-
 			let iAm
 			svgEl.classList.forEach(e=>{
-				if(e.startsWith("bb-target-")) {
+				if(e.startsWith(MS.SVG_el_prefix)) {
 					iAm=e
 				}
 			})
 			const groupFindSubstring = iAm.substring(0,iAm.indexOf("--"))
-			const groupLines = this.shadowRoot.querySelectorAll(`#chart1 > svg  g.bb-chart-lines [class*=${groupFindSubstring}]`)
-			const focusElementIds = []
-			for(let j=0;j<groupLines.length;j++) {
-				groupLines[j].children[0].children[0].classList.forEach(e=>{
-					const bli = groupFindSubstring.replace("target","line")
-					if(e.startsWith(bli)) {
-						focusElementIds.push(e.replaceAll("--",", ").replaceAll("-"," ").replaceAll("target","line").slice(8))
-					}
-				})
-			}
-			Chart.focus(that.chart1, focusElementIds)
+			const focusElementIds = this.getLineGroup(groupFindSubstring)
+			Chart.focus(this.chart1, focusElementIds)
 			if(this.#_lineHoverCallback) {this.#_lineHoverCallback(focusElementIds)}
 			passEventAlong(e)
 		}
@@ -573,6 +545,24 @@ class Element extends HTMLElement {
 		function passEventAlong(e) {		// to the "visual parent"
 			that.shadowRoot.querySelector(`#chart1 .bb-event-rect`).dispatchEvent( new e.constructor(e.type, e) )
 		}
+
+		
+	}
+
+
+	// input: "bb-target-EU"  output: ["EU, Non EU Citizens",    "EU, EU Citizens",    "EU, Nationals"]
+	getLineGroup(groupFindSubstring) {
+		const groupLines = this.shadowRoot.querySelectorAll(`#chart1 > svg  g.bb-chart-lines [class*=${groupFindSubstring}]`)
+		const focusElementIds = []
+		for(let j=0;j<groupLines.length;j++) {
+			groupLines[j].children[0].children[0].classList.forEach(e=>{
+				const bli = groupFindSubstring.replace("target","line")
+				if(e.startsWith(bli)) {
+					focusElementIds.push(e.replaceAll("--",", ").replaceAll("-"," ").replaceAll("target","line").slice(8))
+				}
+			})
+		}
+		return focusElementIds
 	}
 
 	indicateLoading() {
