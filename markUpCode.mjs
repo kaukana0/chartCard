@@ -127,7 +127,7 @@ export default class MarkUpCode {
 				<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:200px; height: 45px; justify-self: right; margin: 5px 30px;">
 					<span class="ecl-button__label" data-ecl-label="true">Read the article</span>
 						<svg class="ecl-icon ecl-icon--xs ecl-icon--rotate-90 ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="">
-							<use xlink:href="../../redist/ecl/icons.svg#corner-arrow"></use>
+							<use xlink:href="./redist/ecl/icons.svg#corner-arrow"></use>
 						</svg>
 				</button>
 				

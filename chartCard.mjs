@@ -23,7 +23,8 @@ class Element extends HTMLElement {
 	#_anchor
 	#_tooltipExtFn1
 	#_tooltipExtFn2
-	#_yLabel
+	#_unitShort = ""
+	#_unitLong = ""
 	#_srcLink1
 	#_srcLink2
 	#_articleLink
@@ -176,7 +177,7 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "ylabel", "srclink1", "srclink2", "articlelink", "infoText"]
+		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "unitshort", "unitlong","srclink1", "srclink2", "articlelink", "infoText"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
@@ -190,7 +191,8 @@ class Element extends HTMLElement {
 				console.error("chartCard: not initialized yet")
 			}
 		}
-		if(name==="ylabel") {	this.#_yLabel = newVal }
+		if(name==="unitshort") {	this.#_unitShort = newVal }
+		if(name==="unitlong") {	this.#_unitLong = newVal }
 		if(name==="articlelink") { this.#_articleLink = newVal }
 		if(name==="srclink2") { this.#_srcLink2 = newVal }
 		if(name==="srclink1") {	this.#_srcLink1 = newVal }
@@ -199,11 +201,12 @@ class Element extends HTMLElement {
 		}
 	}
 
+	// "%" should be directly after the number, "PPS" for instance separated by a space
 	#getSuffix() {
-		if(this.#_yLabel.length===1) {
-			return this.#_yLabel
+		if(this.#_unitShort.length===1) {
+			return this.#_unitShort
 		} else {
-			return " " + this.#_yLabel
+			return " " + this.#_unitShort
 		}
 	}
 
@@ -222,7 +225,7 @@ class Element extends HTMLElement {
 				palette: params.palette,
 				fixColors: params.fixColors,
 				seriesLabels: params.countryNamesFull,
-				suffixText: this.#getSuffix(),	// TODO: introduce new attribute for this if needed
+				suffixText: this.#getSuffix(),
 				tooltipFn: this.#_tooltipExtFn1,
 				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50),
 				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
@@ -246,7 +249,7 @@ class Element extends HTMLElement {
 				palette: params.palette,
 				fixColors: params.fixColors,
 				seriesLabels: params.countryNamesFull,
-				suffixText: this.#getSuffix(),	// TODO: introduce new attribute for this if needed
+				suffixText: this.#getSuffix(),
 				showLines:false,
 				tooltipFn: this.#_tooltipExtFn2,
 				labelEveryTick: true,
@@ -323,8 +326,8 @@ class Element extends HTMLElement {
 
 		this.#_isExpanded = true
 
-		Chart.setYLabel(this.chart1, this.#_yLabel)
-		Chart.setYLabel(this.chart2, this.#_yLabel)
+		Chart.setYLabel(this.chart1, this.#_unitLong)
+		Chart.setYLabel(this.chart2, this.#_unitLong)
 
 		Legend.resetCounter(Chart.getUniqueId(this.chart1)); //console.log("Reset expand", this.getAttribute("id"))
 
