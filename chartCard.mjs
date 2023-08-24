@@ -35,6 +35,7 @@ class Element extends HTMLElement {
 	#_userData				// possibility to associate some info to a card. not used by the card itself for anything.
 	#_lineHoverCallback
 	#_infoText
+	#_decimals = 1
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -103,6 +104,8 @@ class Element extends HTMLElement {
 	get userData() {return this.#_userData}
 
 	set lineHoverCallback(val) {this.#_lineHoverCallback = val}
+
+	set decimals(val) {this.#_decimals = val}
 
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
@@ -240,7 +243,8 @@ class Element extends HTMLElement {
 				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50),
 				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
 					e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
-				)}
+				)},
+				decimals: this.#_decimals
 			})
 			this.#setLinks(true)
 		}
@@ -266,7 +270,8 @@ class Element extends HTMLElement {
 				onFinished: () => setTimeout(
 					()=>this.#resize(false, () => {this.drawVerticalLines()})
 				,50),
-				xAxisLabelBetween:false
+				xAxisLabelBetween:false,
+				decimals: this.#_decimals
 			})
 		}
 	}
