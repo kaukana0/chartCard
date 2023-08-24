@@ -135,6 +135,8 @@ export default class MarkUpCode {
 
 		</div>
 
+		<!--ecl-like-modal id="modal"></ecl-like-modal-->
+
 		${MarkUpCode.loaderCSS()}
 	`}
 

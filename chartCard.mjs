@@ -6,6 +6,7 @@ import * as ChartAxis from "../chart/axis.mjs"
 import * as ChartTooltip from "../chart/tooltip.mjs"
 import * as Legend from "../../components/chart/legend.mjs"
 
+import "../eclLikeModal_/modal.mjs"
 import "../buttonX/button.mjs"
 
 // magic strings
@@ -33,6 +34,7 @@ class Element extends HTMLElement {
 	#_catchUp					// if data was set when invisible, catch up on setting data when it becomes visible
 	#_userData				// possibility to associate some info to a card. not used by the card itself for anything.
 	#_lineHoverCallback
+	#_infoText
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -152,6 +154,16 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
+		this.#$("info").addEventListener("click", (ev) => {
+			// TODO: this is a workaround. 
+			// don't use a global modal (at least not in this way) but fix the problem here that exists because in this app,
+			// "fixed" is relative to a div specified in index.html, rather than the screen.
+			document.getElementById("globalModal").setHeader("Information")
+			document.getElementById("globalModal").setText(this.#_infoText)
+			document.getElementById("globalModal").show()
+			ev.stopPropagation()
+		})
+
 		this.#showChart1(true)
 	}
 
@@ -177,7 +189,7 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "unitshort", "unitlong","srclink1", "srclink2", "articlelink", "infoText"]
+		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "unitshort", "unitlong","srclink1", "srclink2", "articlelink", "infotext"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
@@ -196,9 +208,7 @@ class Element extends HTMLElement {
 		if(name==="articlelink") { this.#_articleLink = newVal }
 		if(name==="srclink2") { this.#_srcLink2 = newVal }
 		if(name==="srclink1") {	this.#_srcLink1 = newVal }
-		if(name==="infotext") {
-			//TODO
-		}
+		if(name==="infotext") { this.#_infoText = newVal }
 	}
 
 	// "%" should be directly after the number, "PPS" for instance separated by a space
