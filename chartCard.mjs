@@ -6,7 +6,7 @@ import * as ChartAxis from "../chart/axis.mjs"
 import * as ChartTooltip from "../chart/tooltip.mjs"
 import * as Legend from "../../components/chart/legend.mjs"
 
-import "../eclLikeModal_/modal.mjs"
+import "../eclLikeModal/modal.mjs"
 import "../buttonX/button.mjs"
 
 // magic strings
