@@ -80,7 +80,6 @@ class Element extends HTMLElement {
 		if(val) {
 			this.style.width=this.#_cardDims[0]
 			this.style.height=this.#_cardDims[1]
-			this.style.visibility="visible"
 			if(this.#_catchUp[0]) {
 				this.setData1(this.#_catchUp[0]) 
 				this.#_catchUp[0] = null
@@ -89,6 +88,7 @@ class Element extends HTMLElement {
 				this.setData2(this.#_catchUp[1]) 
 				this.#_catchUp[1] = null
 			}
+			this.style.visibility="visible"
 		} else {
 			this.style.visibility="hidden"
 			this.style.width="0"
@@ -176,7 +176,7 @@ class Element extends HTMLElement {
 		const hidePos="1000px"
 		this.chart1.parentNode.style.top= show?showPos:hidePos
 		this.chart2.parentNode.style.top= !show?showPos:hidePos
-		this.#setLinks(show)
+		this.#setLink(show)
 	}
 
 	setLegendDotColors(threeColors) {
@@ -246,7 +246,7 @@ class Element extends HTMLElement {
 				)},
 				decimals: this.#_decimals
 			})
-			this.#setLinks(true)
+			this.#setLink(true)
 		}
 		Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset setData", this.getAttribute("id"))
 	}
@@ -276,7 +276,7 @@ class Element extends HTMLElement {
 		}
 	}
 
-	#setLinks(linkC) {
+	#setLink(linkC) {
 		this.#$("sourceLink").setAttribute("href", linkC?this.#_srcLink1:this.#_srcLink2)
 	}
 
@@ -403,10 +403,10 @@ class Element extends HTMLElement {
 
 		Legend.resetCounter(Chart.getUniqueId(this.chart1)); //console.log("Reset contract", this.getAttribute("id"))
 
+		this.#showChart1(true)
+
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
-			this.#showChart1(true)
-	
 			const event = new Event("contracting")
 			this.dispatchEvent(event)
 		})
