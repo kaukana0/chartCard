@@ -74,27 +74,46 @@ class Element extends HTMLElement {
 		this.setAttribute("anchor",val)
 	}
 
-	// billboard can't draw when display:none and moving out of doesn't always not work (e.g. if this card is used as a flex-item)
-	set isVisible(val) {
+	// billboard can't draw when display:none and moving out of view doesn't always work (e.g. if this card is used as a flex-item)
+	async setVisible(val) {
+		if(this.#_isVisible === val) {
+			//console.log("setVisible "+this.getAttribute("id")+" "+val+" ALREADY")
+			return Promise.resolve("setVisible already "+val)
+		} else {
+			//console.log("setVisible "+this.getAttribute("id")+" ßß "+val)
+		}
 		this.#_isVisible = val
 		if(val) {
 			this.style.width=this.#_cardDims[0]
 			this.style.height=this.#_cardDims[1]
-			if(this.#_catchUp[0]) {
-				this.setData1(this.#_catchUp[0]) 
-				this.#_catchUp[0] = null
-			}
 			if(this.#_catchUp[1]) {
 				this.setData2(this.#_catchUp[1]) 
 				this.#_catchUp[1] = null
 			}
 			this.style.visibility="visible"
+
+			if(this.#_catchUp[0]) {
+
+				//console.log("set vis, setData"+this.getAttribute("id"))
+				//const a = "BLA" //await this.setData1(this.#_catchUp[0])
+				//console.log("set vis, after setData"+this.getAttribute("id"), a)
+				//this.#_catchUp[0] = null
+				//return new Promise((resolve)=>resolve("setVis catchup"))
+
+				return this.setData1(this.#_catchUp[0])
+
+			} else {
+				return new Promise((resolve)=>resolve("setVisible show"))
+			}
 		} else {
-			this.style.visibility="hidden"
 			this.style.width="0"
 			this.style.height="0"
+			this.style.visibility="hidden"
+			return new Promise((resolve)=>resolve("setVisible hide"))
 		}
 	}
+
+	isVisible() {return this.#_isVisible}
 
 	set tooltipFn1(val) {this.#_tooltipExtFn1 = val}
 	set tooltipFn2(val) {this.#_tooltipExtFn2 = val}
@@ -134,7 +153,7 @@ class Element extends HTMLElement {
 			this.#showChart1(false)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
-			Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset swicth to 2", this.getAttribute("id"))
+			Legend.resetCounter("switch to 2 " + this.getAttribute("id"), Chart.getUniqueId(this.chart1), 2)
 
 			const event = new Event("chartSwitched")
 			event["to"] = 2
@@ -145,7 +164,7 @@ class Element extends HTMLElement {
 			this.#showChart1(true)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
-			Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset swicth to 1", this.getAttribute("id"))
+			Legend.resetCounter("switch to 1 " + this.getAttribute("id"), Chart.getUniqueId(this.chart1), 2)
 
 			const event = new Event("chartSwitched")
 			event["to"] = 1
@@ -228,27 +247,42 @@ class Element extends HTMLElement {
 	setData1(params) {
 		if(!this.#_isVisible) {
 			this.#_catchUp[0] = params
+			//console.log("setData1 delayed " + this.getAttribute("id"))
+			return new Promise((resolve)=>resolve("setData1 storing"))
+
 		} else {
-			Chart.init({
-				chartDOMElementId: this.chart1,
-				type: "line",
-				legendDOMElementId: this.shadowRoot.getElementById("legend1"),
-				legendBehaviour: "hover",
-				cols: params.cols,
-				palette: params.palette,
-				fixColors: params.fixColors,
-				seriesLabels: params.countryNamesFull,
-				suffixText: this.#getSuffix(),
-				tooltipFn: this.#_tooltipExtFn1,
-				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50),
-				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
-					e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
-				)},
-				decimals: this.#_decimals
+
+			//console.log("setData1 " + this.getAttribute("id"))
+			return new Promise((resolve)=>
+			{
+				Chart.init({
+					chartDOMElementId: this.chart1,
+					type: "line",
+					legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+					legendBehaviour: "hover",
+					cols: params.cols,
+					palette: params.palette,
+					fixColors: params.fixColors,
+					seriesLabels: params.countryNamesFull,
+					suffixText: this.#getSuffix(),
+					tooltipFn: this.#_tooltipExtFn1,
+					onFinished: ()=> {
+							this.#_catchUp[0] = null
+							setTimeout(()=>this.#resize(true, () => {
+								this.addMultiLineFocus(); 
+								resolve("setData1 done "+this.getAttribute("id"));
+							}), 50)
+					},
+					legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
+						e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
+					)},
+					decimals: this.#_decimals
+				})
+				this.#setLink(true)
+				Legend.resetCounter("setData1 " + this.getAttribute("id"), Chart.getUniqueId(this.chart1), 2)
 			})
-			this.#setLink(true)
+
 		}
-		Legend.resetCounter(Chart.getUniqueId(this.chart1), 2); //console.log("Reset setData", this.getAttribute("id"))
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
@@ -344,7 +378,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, this.#_unitLong)
 		Chart.setYLabel(this.chart2, this.#_unitLong)
 
-		Legend.resetCounter(Chart.getUniqueId(this.chart1)); //console.log("Reset expand", this.getAttribute("id"))
+		Legend.resetCounter("expand " + this.getAttribute("id"), Chart.getUniqueId(this.chart1))
 
 		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
 		this.#resize(true, () => {
@@ -355,7 +389,8 @@ class Element extends HTMLElement {
 	}
 
 	contract() {
-		if(!this.#_isExpanded) return
+		//console.log("contract " + this.getAttribute("id"), "isExp:", this.#_isExpanded)
+		if(!this.#_isExpanded || !this.#_isVisible) return
 
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
@@ -401,7 +436,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, null)
 		Chart.setYLabel(this.chart2, null)
 
-		Legend.resetCounter(Chart.getUniqueId(this.chart1)); //console.log("Reset contract", this.getAttribute("id"))
+		Legend.resetCounter("contract"+this.getAttribute("id"), Chart.getUniqueId(this.chart1))
 
 		this.#showChart1(true)
 
