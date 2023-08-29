@@ -41,6 +41,8 @@ class Element extends HTMLElement {
 		return this.shadowRoot.getElementById(elementId)
 	}
 
+	#id() {return this.getAttribute("id")}
+
 	constructor() {
 		super()
 		this.attachShadow({mode: 'open'})
@@ -77,10 +79,10 @@ class Element extends HTMLElement {
 	// billboard can't draw when display:none and moving out of view doesn't always work (e.g. if this card is used as a flex-item)
 	async setVisible(val) {
 		if(this.#_isVisible === val) {
-			//console.log("setVisible "+this.getAttribute("id")+" "+val+" ALREADY")
-			return Promise.resolve("setVisible already "+val)
+			//console.log("setVisible "+this.#id()+" "+val+" ALREADY")
+			return Promise.resolve("setVisible already "+this.#id())
 		} else {
-			//console.log("setVisible "+this.getAttribute("id")+" ßß "+val)
+			//console.log("setVisible "+this.#id()+" ßß "+val)
 		}
 		this.#_isVisible = val
 		if(val) {
@@ -94,22 +96,22 @@ class Element extends HTMLElement {
 
 			if(this.#_catchUp[0]) {
 
-				//console.log("set vis, setData"+this.getAttribute("id"))
+				//console.log("set vis, setData"+this.#id())
 				//const a = "BLA" //await this.setData1(this.#_catchUp[0])
-				//console.log("set vis, after setData"+this.getAttribute("id"), a)
+				//console.log("set vis, after setData"+this.#id(), a)
 				//this.#_catchUp[0] = null
 				//return new Promise((resolve)=>resolve("setVis catchup"))
 
 				return this.setData1(this.#_catchUp[0])
 
 			} else {
-				return new Promise((resolve)=>resolve("setVisible show"))
+				return new Promise((resolve)=>resolve("setVisible show "+this.#id() ))
 			}
 		} else {
 			this.style.width="0"
 			this.style.height="0"
 			this.style.visibility="hidden"
-			return new Promise((resolve)=>resolve("setVisible hide"))
+			return new Promise((resolve)=>resolve("setVisible hide " + this.#id()))
 		}
 	}
 
@@ -153,7 +155,7 @@ class Element extends HTMLElement {
 			this.#showChart1(false)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
-			Legend.resetCounter("switch to 2 " + this.getAttribute("id"), Chart.getUniqueId(this.chart1), 2)
+			Legend.resetCounter("switch to 2 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 
 			const event = new Event("chartSwitched")
 			event["to"] = 2
@@ -164,7 +166,7 @@ class Element extends HTMLElement {
 			this.#showChart1(true)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
-			Legend.resetCounter("switch to 1 " + this.getAttribute("id"), Chart.getUniqueId(this.chart1), 2)
+			Legend.resetCounter("switch to 1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 
 			const event = new Event("chartSwitched")
 			event["to"] = 1
@@ -247,12 +249,12 @@ class Element extends HTMLElement {
 	setData1(params) {
 		if(!this.#_isVisible) {
 			this.#_catchUp[0] = params
-			//console.log("setData1 delayed " + this.getAttribute("id"))
-			return new Promise((resolve)=>resolve("setData1 storing"))
+			//console.log("setData1 delayed " + this.#id())
+			return new Promise((resolve)=>resolve("setData1 storing "+this.#id()))
 
 		} else {
 
-			//console.log("setData1 " + this.getAttribute("id"))
+			//console.log("setData1 " + this.#id())
 			return new Promise((resolve)=>
 			{
 				Chart.init({
@@ -270,7 +272,7 @@ class Element extends HTMLElement {
 							this.#_catchUp[0] = null
 							setTimeout(()=>this.#resize(true, () => {
 								this.addMultiLineFocus(); 
-								resolve("setData1 done "+this.getAttribute("id"));
+								resolve("setData1 done "+this.#id());
 							}), 50)
 					},
 					legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
@@ -279,7 +281,7 @@ class Element extends HTMLElement {
 					decimals: this.#_decimals
 				})
 				this.#setLink(true)
-				Legend.resetCounter("setData1 " + this.getAttribute("id"), Chart.getUniqueId(this.chart1), 2)
+				Legend.resetCounter("setData1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 			})
 
 		}
@@ -324,7 +326,8 @@ class Element extends HTMLElement {
 	}
 
 	expand(relativeTo) {
-		if(this.#_isExpanded) return
+		if(this.#_isExpanded) {console.log("BH card expand no "+this.#id()); return}
+		console.log("BH card expand "+this.#id())
 
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
@@ -378,7 +381,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, this.#_unitLong)
 		Chart.setYLabel(this.chart2, this.#_unitLong)
 
-		Legend.resetCounter("expand " + this.getAttribute("id"), Chart.getUniqueId(this.chart1))
+		Legend.resetCounter("expand " + this.#id(), Chart.getUniqueId(this.chart1))
 
 		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
 		this.#resize(true, () => {
@@ -388,9 +391,10 @@ class Element extends HTMLElement {
 		this.#resize(false, () => {this.drawVerticalLines()})
 	}
 
-	contract() {
-		//console.log("contract " + this.getAttribute("id"), "isExp:", this.#_isExpanded)
-		if(!this.#_isExpanded || !this.#_isVisible) return
+	contract(dispatchEvent=true) {
+		//console.log("contract " + this.#id(), "isExp:", this.#_isExpanded)
+		if(!this.#_isExpanded) {console.log("BH card contract no "+this.#id()); return}
+		console.log("BH card contract "+this.#id())
 
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
@@ -399,10 +403,14 @@ class Element extends HTMLElement {
 		sroot.style.zIndex=""
 		sroot.style.width=""
 		sroot.style.height=""
-
 		div.style.position=""
-		div.style.width=MS.width
+		div.style.width= MS.width
 		div.style.height=MS.height
+
+//		console.log("ÜÜ",div.style.width, div.style.height)
+//		div.style.width= this.#_isVisible?MS.width:"0"
+//		div.style.height=this.#_isVisible?MS.height:"0"
+//		console.log("ÜÜ",div.style.width, div.style.height)
 		div.style.top=""
 		div.style.left=""
 		div.style.zIndex=""
@@ -436,14 +444,16 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, null)
 		Chart.setYLabel(this.chart2, null)
 
-		Legend.resetCounter("contract"+this.getAttribute("id"), Chart.getUniqueId(this.chart1))
+		Legend.resetCounter("contract"+this.#id(), Chart.getUniqueId(this.chart1))
 
 		this.#showChart1(true)
 
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
-			const event = new Event("contracting")
-			this.dispatchEvent(event)
+			if(dispatchEvent) {
+				const event = new Event("contracting")
+				this.dispatchEvent(event)
+			}
 		})
 		this.#resize(false)
 	}
