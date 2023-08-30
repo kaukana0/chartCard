@@ -76,46 +76,27 @@ class Element extends HTMLElement {
 		this.setAttribute("anchor",val)
 	}
 
-	// billboard can't draw when display:none and moving out of view doesn't always work (e.g. if this card is used as a flex-item)
-	async setVisible(val) {
-		if(this.#_isVisible === val) {
-			//console.log("setVisible "+this.#id()+" "+val+" ALREADY")
-			return Promise.resolve("setVisible already "+this.#id())
-		} else {
-			//console.log("setVisible "+this.#id()+" ßß "+val)
-		}
+	// billboard can't draw when display:none and moving out of doesn't always not work (e.g. if this card is used as a flex-item)
+	set isVisible(val) {
 		this.#_isVisible = val
 		if(val) {
 			this.style.width=this.#_cardDims[0]
 			this.style.height=this.#_cardDims[1]
+			if(this.#_catchUp[0]) {
+				this.setData1(this.#_catchUp[0]) 
+				this.#_catchUp[0] = null
+			}
 			if(this.#_catchUp[1]) {
 				this.setData2(this.#_catchUp[1]) 
 				this.#_catchUp[1] = null
 			}
 			this.style.visibility="visible"
-
-			if(this.#_catchUp[0]) {
-
-				//console.log("set vis, setData"+this.#id())
-				//const a = "BLA" //await this.setData1(this.#_catchUp[0])
-				//console.log("set vis, after setData"+this.#id(), a)
-				//this.#_catchUp[0] = null
-				//return new Promise((resolve)=>resolve("setVis catchup"))
-
-				return this.setData1(this.#_catchUp[0])
-
-			} else {
-				return new Promise((resolve)=>resolve("setVisible show "+this.#id() ))
-			}
 		} else {
+			this.style.visibility="hidden"
 			this.style.width="0"
 			this.style.height="0"
-			this.style.visibility="hidden"
-			return new Promise((resolve)=>resolve("setVisible hide " + this.#id()))
 		}
 	}
-
-	isVisible() {return this.#_isVisible}
 
 	set tooltipFn1(val) {this.#_tooltipExtFn1 = val}
 	set tooltipFn2(val) {this.#_tooltipExtFn2 = val}
@@ -249,42 +230,27 @@ class Element extends HTMLElement {
 	setData1(params) {
 		if(!this.#_isVisible) {
 			this.#_catchUp[0] = params
-			//console.log("setData1 delayed " + this.#id())
-			return new Promise((resolve)=>resolve("setData1 storing "+this.#id()))
-
 		} else {
-
-			//console.log("setData1 " + this.#id())
-			return new Promise((resolve)=>
-			{
-				Chart.init({
-					chartDOMElementId: this.chart1,
-					type: "line",
-					legendDOMElementId: this.shadowRoot.getElementById("legend1"),
-					legendBehaviour: "hover",
-					cols: params.cols,
-					palette: params.palette,
-					fixColors: params.fixColors,
-					seriesLabels: params.countryNamesFull,
-					suffixText: this.#getSuffix(),
-					tooltipFn: this.#_tooltipExtFn1,
-					onFinished: ()=> {
-							this.#_catchUp[0] = null
-							setTimeout(()=>this.#resize(true, () => {
-								this.addMultiLineFocus(); 
-								resolve("setData1 done "+this.#id());
-							}), 50)
-					},
-					legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
-						e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
-					)},
-					decimals: this.#_decimals
-				})
-				this.#setLink(true)
-				Legend.resetCounter("setData1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
+			Chart.init({
+				chartDOMElementId: this.chart1,
+				type: "line",
+				legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+				legendBehaviour: "hover",
+				cols: params.cols,
+				palette: params.palette,
+				fixColors: params.fixColors,
+				seriesLabels: params.countryNamesFull,
+				suffixText: this.#getSuffix(),
+				tooltipFn: this.#_tooltipExtFn1,
+				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50),
+				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
+					e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
+				)},
+				decimals: this.#_decimals
 			})
-
+			this.#setLink(true)
 		}
+		Legend.resetCounter("setData1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
@@ -326,8 +292,7 @@ class Element extends HTMLElement {
 	}
 
 	expand(relativeTo) {
-		if(this.#_isExpanded) {console.log("BH card expand no "+this.#id()); return}
-		console.log("BH card expand "+this.#id())
+		if(this.#_isExpanded) return
 
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
@@ -391,10 +356,8 @@ class Element extends HTMLElement {
 		this.#resize(false, () => {this.drawVerticalLines()})
 	}
 
-	contract(dispatchEvent=true) {
-		//console.log("contract " + this.#id(), "isExp:", this.#_isExpanded)
-		if(!this.#_isExpanded) {console.log("BH card contract no "+this.#id()); return}
-		console.log("BH card contract "+this.#id())
+	contract() {
+		if(!this.#_isExpanded) return
 
 		const div = this.shadowRoot.querySelector(".main")
 		const sroot = this
@@ -403,14 +366,10 @@ class Element extends HTMLElement {
 		sroot.style.zIndex=""
 		sroot.style.width=""
 		sroot.style.height=""
-		div.style.position=""
-		div.style.width= MS.width
-		div.style.height=MS.height
 
-//		console.log("ÜÜ",div.style.width, div.style.height)
-//		div.style.width= this.#_isVisible?MS.width:"0"
-//		div.style.height=this.#_isVisible?MS.height:"0"
-//		console.log("ÜÜ",div.style.width, div.style.height)
+		div.style.position=""
+		div.style.width=MS.width
+		div.style.height=MS.height
 		div.style.top=""
 		div.style.left=""
 		div.style.zIndex=""
@@ -450,10 +409,8 @@ class Element extends HTMLElement {
 
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
-			if(dispatchEvent) {
-				const event = new Event("contracting")
-				this.dispatchEvent(event)
-			}
+			const event = new Event("contracting")
+			this.dispatchEvent(event)
 		})
 		this.#resize(false)
 	}
