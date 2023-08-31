@@ -246,7 +246,8 @@ class Element extends HTMLElement {
 				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
 					e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
 				)},
-				decimals: this.#_decimals
+				decimals: this.#_decimals,
+				padding: -0.4
 			})
 			this.#setLink(true)
 		}
@@ -270,10 +271,11 @@ class Element extends HTMLElement {
 				tooltipFn: this.#_tooltipExtFn2,
 				labelEveryTick: true,
 				onFinished: () => setTimeout(
-					()=>this.#resize(false, () => {this.drawVerticalLines()})
+					()=>this.#resize(false, () => {this.drawVerticalLines(params.highlightIndices)})
 				,50),
 				xAxisLabelBetween:false,
-				decimals: this.#_decimals
+				decimals: this.#_decimals,
+				padding: -0.2
 			})
 		}
 	}
@@ -433,7 +435,8 @@ class Element extends HTMLElement {
 
 	// TODO: this functionality belongs to chart really, not to chartCard.
 	// TODO: This is project specific (even contains magic strings) - it has to be generalized. Please see also comment for setData1().
-	drawVerticalLines() {
+	drawVerticalLines(highlightIndices) {
+		const highlight = highlightIndices?highlightIndices:[]
 
 		const node = this.shadowRoot.querySelector("#verticalLines")
 		if(node) node.remove()
@@ -474,8 +477,8 @@ class Element extends HTMLElement {
 			l.setAttribute("y1", ymi+offsetY)
 			l.setAttribute("x2", x+offsetX)
 			l.setAttribute("y2", yma+offsetY)
-			l.setAttribute("style", "stroke: #CCC")
-			l.setAttribute("stroke-width", "2")
+			l.setAttribute("style", "stroke: " + (highlight.includes(i)?"#444":"#CCC"))
+			l.setAttribute("stroke-width", highlight.includes(i)?"3":"2")
 
 			g.appendChild(l)
 		}
