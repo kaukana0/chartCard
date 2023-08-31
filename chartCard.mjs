@@ -205,7 +205,7 @@ class Element extends HTMLElement {
 			if(this.shadowRoot.getElementById(name)) {
 				this.shadowRoot.getElementById(name).innerHTML = newVal
 			} else {
-				console.error("chartCard: not initialized yet")
+				console.error("chartCard: not initialized yet "+this.#id())
 			}
 		}
 		if(name==="unitshort") {	this.#_unitShort = newVal }
@@ -332,7 +332,7 @@ class Element extends HTMLElement {
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
 		} else {
-			console.error("chartCard: no line chart")
+			console.error("chartCard: no line chart "+this.#id())
 		}
 		this.shadowRoot.getElementById("main").classList.remove("blueBorder")
 		this.shadowRoot.getElementById("info").style.display="inline"
@@ -389,7 +389,7 @@ class Element extends HTMLElement {
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft=`-${MS.shift}px`
 		} else {
-			console.error("chartCard: no line chart")
+			console.error("chartCard: no dot plot chart"+this.#id())
 		}
 		this.shadowRoot.getElementById("main").classList.add("blueBorder")
 		this.shadowRoot.getElementById("info").style.display="none"
@@ -444,7 +444,7 @@ class Element extends HTMLElement {
 			if(neu.length===0 || eu.length===0 || nat.length!==0) {
 				//some of them 0 is normal
 			} else {
-				console.error("chartCard: dot plot unequal number of dots")
+				console.error("chartCard: dot plot unequal number of dots "+this.#id())
 			}
 			return
 		}
