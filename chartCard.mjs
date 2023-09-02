@@ -9,6 +9,8 @@ import * as Legend from "../../components/chart/legend.mjs"
 import "../eclLikeModal/modal.mjs"
 import "../buttonX/button.mjs"
 
+import "../../redist/html2canvas-1.4.1.js"		// TODO: esm?
+
 // magic strings
 const MS = {
 	width: "380px",
@@ -159,6 +161,17 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
+		this.#$("downloadLink").addEventListener("click", (ev) => {
+			html2canvas(this.shadowRoot.getElementById("main")).then(function(canvas) {
+				const createEl = document.createElement('a');
+				createEl.href = canvas.toDataURL();
+				createEl.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png";
+				createEl.click();
+				createEl.remove();
+			});
+			ev.stopPropagation()
+		})
+
 		this.#$("info").addEventListener("click", (ev) => {
 			// TODO: this is a workaround. 
 			// don't use a global modal (at least not in this way) but fix the problem here that exists because in this app,
@@ -275,7 +288,8 @@ class Element extends HTMLElement {
 				,50),
 				xAxisLabelBetween:false,
 				decimals: this.#_decimals,
-				padding: -0.2
+				padding: -0.2,
+				firstDifferent: "EU, "
 			})
 		}
 	}
