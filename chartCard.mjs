@@ -157,7 +157,7 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("articleLink").addEventListener("click", (ev) => {
-			window.open(this.#_articleLink,"_self")
+			window.open(this.#_articleLink,"")
 			ev.stopPropagation()
 		})
 

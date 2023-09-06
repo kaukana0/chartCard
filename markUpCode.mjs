@@ -74,11 +74,11 @@ export default class MarkUpCode {
 			</div>
 			<div style="display:flex;">
 				<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
-				<h2 id="header_e" style="display:none; height:auto; margin:3px;">${titleLong}</h2>
+				<h2 id="header_e" style="display:none; height:auto; margin: 3px 10px 3px 25px;">${titleLong}</h2>
 				<symbol-button id="info" symbol="info" style="display:none; margin:-4px 0 0 5px;"></symbol-button>
 			</div>
 			<div id="subtitle_c" style="height:5%; margin-left:3px;">Subtitle</div>
-			<div id="subtitle_e" style="display:none; height:5%; margin-left:3px;">Subtitle</div>
+			<div id="subtitle_e" style="display:none; height:5%; margin: 3px 10px 3px 25px;">Subtitle</div>
 			<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
