@@ -284,7 +284,10 @@ class Element extends HTMLElement {
 				tooltipFn: this.#_tooltipExtFn2,
 				labelEveryTick: true,
 				onFinished: () => setTimeout(
-					()=>this.#resize(false, () => {this.drawVerticalLines(params.highlightIndices)})
+					()=>this.#resize(false, () => {
+						this.drawVerticalLines(params.highlightIndices)
+						this.hiliteXAxisEntries(params.highlightIndices)
+					})
 				,50),
 				xAxisLabelBetween:false,
 				decimals: this.#_decimals,
@@ -447,6 +450,22 @@ class Element extends HTMLElement {
 		}
 	}
 
+
+	hiliteXAxisEntries(highlightIndices) {
+		const texts = this.shadowRoot.querySelector(`#chart2 > svg > g > g.bb-axis.bb-axis-x`).children
+		for(let i=1; i<texts.length; i++) {
+			const node = texts[i].childNodes[1]
+			if(node) {
+				if(highlightIndices.includes(i-1)) {
+					node.setAttribute("font-weight","bold")
+				} else {
+					node.removeAttribute("font-weight")
+				}
+			}
+		}
+	}
+
+
 	// TODO: this functionality belongs to chart really, not to chartCard.
 	// TODO: This is project specific (even contains magic strings) - it has to be generalized. Please see also comment for setData1().
 	drawVerticalLines(highlightIndices) {
@@ -520,7 +539,7 @@ class Element extends HTMLElement {
 
 		}
 	
-		function getX(a,b,c) {
+		function getX(a,b,c) {	// return the first not zero, if any
 			let zeros=0
 			if(a===0) zeros++
 			if(b===0) zeros++
