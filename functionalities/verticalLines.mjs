@@ -1,3 +1,5 @@
+import {MS} from "../../../js/common/magicStrings.mjs"    // TODO! NO! no dependencies of components on application!
+
 // TODO: this functionality belongs to chart really, not to chartCard.
 // TODO: This is project specific (even contains magic strings) - it has to be generalized. Please see also comment for setData1().
 export default function drawVerticalLines(DOMRoot, highlightIndices, cols, noDatapointId) {
@@ -20,18 +22,19 @@ export default function drawVerticalLines(DOMRoot, highlightIndices, cols, noDat
   const offsetY = Number(5)
 
   for(let i=0; i<neu.length; i++) {
-    const x = getX(
-      Number(neu[i].getAttribute("x")),
-      Number(eu[i].getAttribute("x")),
-      Number(nat[i].getAttribute("x"))
+    const x = firstNonZero(
+      neu.length ? Number(neu[i].getAttribute("x")) : 0,
+      eu.length  ? Number(eu[i] .getAttribute("x")) : 0,
+      nat.length ? Number(nat[i].getAttribute("x")) : 0
     )
     if(x<=0) {continue}
 
     const [ymi,yma] = getMinMax(
-      neu[i].hasAttribute("opacity") ? 0 : Number(neu[i].getAttribute("y")), 
-      eu [i].hasAttribute("opacity") ? 0 : Number(eu [i].getAttribute("y")), 
-      nat[i].hasAttribute("opacity") ? 0 : Number(nat[i].getAttribute("y"))
+      neu[i] && !neu[i].hasAttribute("opacity") ? Number(neu[i].getAttribute("y")) : 0,
+      eu [i] && !eu [i].hasAttribute("opacity") ? Number(eu [i].getAttribute("y")) : 0,
+      nat[i] && !nat[i].hasAttribute("opacity") ? Number(nat[i].getAttribute("y")) : 0
     )
+    if(ymi===0 && yma===0) {continue}
     
     const l = document.createElementNS("http://www.w3.org/2000/svg", "line")
     l.setAttribute("x1", x+offsetX)
@@ -47,19 +50,11 @@ export default function drawVerticalLines(DOMRoot, highlightIndices, cols, noDat
   const out = DOMRoot.querySelector("#chart2 > svg  g.bb-chart-lines")
   out.insertAdjacentElement("afterbegin", g)	// behind the dots
 
-  function getX(a,b,c) {	// return the first not zero, if any
-    let zeros=0
-    if(a===0) zeros++
-    if(b===0) zeros++
-    if(c===0) zeros++
-    if(zeros>1) {
-      return -1
-    } else {
-      let x = a
-      if(x===0) {x=b}
-      if(x===0) {x=c}
-      return x
-    }
+  function firstNonZero(a,b,c) {	// return the first not zero, if any
+    let x = a
+    if(x===0) {x=b}
+    if(x===0) {x=c}
+    return x
   }
 
   function getMinMax(a,b,c) {
@@ -105,8 +100,8 @@ function getDots(root) {
       //some of them 0 is normal
     } else {
       console.error("chartCard: dot plot unequal number of dots") // this.#id()
+      return
     }
-    return
   }
 
   return retVal
@@ -120,9 +115,21 @@ function hideDots(dots, cols, noDatapointId) {
   if(!dots) {return}
   const [neu,eu,nat] = dots
 
-  for(let i=0; i<neu.length; i++) {
-    if(cols[1][i+1]===noDatapointId) {neu[i].setAttribute("opacity","0")}
-    if(cols[2][i+1]===noDatapointId) {eu[i].setAttribute("opacity","0")}
-    if(cols[3][i+1]===noDatapointId) {nat[i].setAttribute("opacity","0")}
+  const bla = new Map()
+  bla.set(MS.TXT_BY_LBL_CNEU, neu)
+  bla.set(MS.TXT_BY_LBL_CEU, eu)
+  bla.set(MS.TXT_BY_LBL_CNAT, nat)
+  bla.set(MS.TXT_BY_LBL_BNEU, neu)
+  bla.set(MS.TXT_BY_LBL_BEU, eu)
+  bla.set(MS.TXT_BY_LBL_BNAT, nat)
+
+  const len = neu.length || eu.length || nat.length
+
+  for(let i=0; i<len; i++) {       // datapoints in a series
+    for(let j=1; j<cols.length; j++) {    // series
+      if(cols[j][i+1]===noDatapointId) {
+        bla.get(cols[j][0])[i].setAttribute("opacity","0")
+      }
+    }
   }
 }

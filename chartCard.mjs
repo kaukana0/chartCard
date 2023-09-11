@@ -139,7 +139,7 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("switchTo2").addEventListener("click", (ev) => {
-			this.#showChart1(false)
+			setTimeout(()=>this.#showChart1(false), 500)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
 			Legend.resetCounter("switch to 2 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
@@ -378,7 +378,7 @@ class Element extends HTMLElement {
 			const event = new Event("expanding")
 			this.dispatchEvent(event)
 		})
-		this.#resize(false)
+		this.#resize(false, ()=>{})		//TODO
 	}
 
 	contract() {
