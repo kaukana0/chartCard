@@ -11,12 +11,16 @@ import "../buttonX/button.mjs"
 
 import "../../redist/html2canvas-1.4.1.js"		// TODO: esm?
 
+import * as MultilineFocus from "./functionalities/multilineFocus.mjs"
+import drawVerticalLines from "./functionalities/verticalLines.mjs"
+
 // magic strings
 const MS = {
 	width: "380px",
 	height: "380px",
 	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
-	SVG_el_prefix: "bb-target-"
+	SVG_el_prefix: "bb-target-",
+	ID_NO_DATAPOINT: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
 }
 
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
@@ -255,9 +259,11 @@ class Element extends HTMLElement {
 				seriesLabels: params.countryNamesFull,
 				suffixText: this.#getSuffix(),
 				tooltipFn: this.#_tooltipExtFn1,
-				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {this.addMultiLineFocus()}),50),
+				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {
+											MultilineFocus.addMultiLineFocus(this.shadowRoot, this.chart1, this.#_lineHoverCallback, MS.SVG_el_prefix)
+										}),50),
 				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
-					e ? this.getLineGroup(MS.SVG_el_prefix+e.substring(0,2)) : e
+					e ? MultilineFocus.getLineGroup(this.shadowRoot, MS.SVG_el_prefix+e.substring(0,2)) : e
 				)},
 				decimals: this.#_decimals,
 				padding: -0.4
@@ -285,7 +291,7 @@ class Element extends HTMLElement {
 				labelEveryTick: true,
 				onFinished: () => setTimeout(
 					()=>this.#resize(false, () => {
-						this.drawVerticalLines(params.highlightIndices)
+						drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT)
 						this.hiliteXAxisEntries(params.highlightIndices)
 					})
 				,50),
@@ -346,7 +352,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="grid"
-		this.shadowRoot.getElementById("chartContainer").style.height="60%"
+		this.shadowRoot.getElementById("chartContainer").style.height="55%"
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
@@ -372,7 +378,7 @@ class Element extends HTMLElement {
 			const event = new Event("expanding")
 			this.dispatchEvent(event)
 		})
-		this.#resize(false, () => {this.drawVerticalLines()})
+		this.#resize(false)
 	}
 
 	contract() {
@@ -463,162 +469,6 @@ class Element extends HTMLElement {
 				}
 			}
 		}
-	}
-
-
-	// TODO: this functionality belongs to chart really, not to chartCard.
-	// TODO: This is project specific (even contains magic strings) - it has to be generalized. Please see also comment for setData1().
-	drawVerticalLines(highlightIndices) {
-		const highlight = highlightIndices?highlightIndices:[]
-
-		const node = this.shadowRoot.querySelector("#verticalLines")
-		if(node) node.remove()
-
-		const [neu,eu,nat] = getDots(this.shadowRoot)
-		
-		if( neu.length!==eu.length || neu.length!==nat.length ) {
-			if(neu.length===0 || eu.length===0 || nat.length!==0) {
-				//some of them 0 is normal
-			} else {
-				console.error("chartCard: dot plot unequal number of dots "+this.#id())
-			}
-			return
-		}
-
-		const g = document.createElementNS("http://www.w3.org/2000/svg","g")
-		g.setAttribute("id", "verticalLines")
-
-		const offsetX = Number(6)
-		const offsetY = Number(5)
-	
-		for(let i=0; i<neu.length; i++) {
-			const x = getX(
-				Number(neu[i].getAttribute("x")),
-				Number(eu[i].getAttribute("x")),
-				Number(nat[i].getAttribute("x"))
-			)
-			if(x<=0) {continue}
-
-			const [ymi,yma] = getMinMax(
-				Number(neu[i].getAttribute("y")), 
-				Number(eu[i].getAttribute("y")), 
-				Number(nat[i].getAttribute("y"))
-			)
-			
-			const l = document.createElementNS("http://www.w3.org/2000/svg", "line")
-			l.setAttribute("x1", x+offsetX)
-			l.setAttribute("y1", ymi+offsetY)
-			l.setAttribute("x2", x+offsetX)
-			l.setAttribute("y2", yma+offsetY)
-			l.setAttribute("style", "stroke: " + (highlight.includes(i)?"#444":"#CCC"))
-			l.setAttribute("stroke-width", highlight.includes(i)?"3":"2")
-
-			g.appendChild(l)
-		}
-
-		const out = this.shadowRoot.querySelector("#chart2 > svg  g.bb-chart-lines")
-		out.insertAdjacentElement("afterbegin", g)	// behind the dots
-
-		function getDots(root) {
-			const byCitizenship = ["Citizens-of-a-non-EU-country",  "Citizens-of-another-EU-country", "Nationals"]
-			const byBirth = ["Born-in-a-non-EU-country", "Born-in-another-EU-country", "Native-born"]
-			function sel(bla) {return `#chart2 > svg > g > g.bb-chart > g.bb-chart-lines > g.bb-chart-line.bb-target.bb-target-${bla} > g.bb-circles > use`}
-
-			const neu = root.querySelectorAll(sel(byCitizenship[0]))
-			const eu  = root.querySelectorAll(sel(byCitizenship[1]))
-			const nat = root.querySelectorAll(sel(byCitizenship[2]))
-			if(neu.length===0 && eu.length===0 && nat.length===0) {
-				return [
-					root.querySelectorAll(sel(byBirth[0])),
-					root.querySelectorAll(sel(byBirth[1])),
-					root.querySelectorAll(sel(byBirth[2]))
-				]
-			} else {
-				return [neu,eu,nat]
-			}
-
-		}
-	
-		function getX(a,b,c) {	// return the first not zero, if any
-			let zeros=0
-			if(a===0) zeros++
-			if(b===0) zeros++
-			if(c===0) zeros++
-			if(zeros>1) {
-				return -1
-			} else {
-				let x = a
-				if(x===0) {x=b}
-				if(x===0) {x=c}
-				return x
-			}
-		}
-
-		function getMinMax(a,b,c) {
-			if(a===0) { a=b }	// avoid 0 in case of <3 points
-			if(b===0) { b=c }
-			if(c===0) { c=a }
-
-			const min = (a<b?a:b) < c ? (a<b?a:b) : c
-			const max = (a>b?a:b) > c ? (a>b?a:b) : c
-			return [min,max]
-		}
-	}
-
-	// see also adr13.md
-	addMultiLineFocus() {
-		const that = this
-
-		const lines = this.shadowRoot.querySelector("#chart1 > svg  g.bb-chart-lines")
-		for(let i=0; i<lines.children.length; i++) {
-			lines.children[i].style.pointerEvents="visibleStroke"		// see comment for passEventAlong()
-			const focus_pa = focus.bind(this,lines.children[i])
-			lines.children[i].addEventListener('mouseover', focus_pa)
-			lines.children[i].addEventListener('mouseout', defocus)
-			lines.children[i].addEventListener('mousemove', e=>passEventAlong(e))
-		}
-
-		function focus(svgEl,e) {
-			let iAm
-			svgEl.classList.forEach(e=>{
-				if(e.startsWith(MS.SVG_el_prefix)) {
-					iAm=e
-				}
-			})
-			const groupFindSubstring = iAm.substring(0,iAm.indexOf("--"))
-			const focusElementIds = this.getLineGroup(groupFindSubstring)
-			Chart.focus(this.chart1, focusElementIds)
-			if(this.#_lineHoverCallback) {this.#_lineHoverCallback(focusElementIds)}
-			passEventAlong(e)
-		}
-
-		function defocus(e) { Chart.focus(that.chart1); that.#_lineHoverCallback([]); passEventAlong(e) }
-
-		// caveat: setting pointerEvents (to not "none") on lines enables us to handle events.
-		// but the event doesn't get propagated further to elements which are visually behind/below the lines.
-		// why? because the lines are not DOM children of the element handling the tooltip. they're merely drawn on top visually.
-		// so, do it manually :-o
-		function passEventAlong(e) {		// to the "visual parent"
-			that.shadowRoot.querySelector(`#chart1 .bb-event-rect`).dispatchEvent( new e.constructor(e.type, e) )
-		}
-
-		
-	}
-
-
-	// input: "bb-target-EU"  output: ["EU, Non EU Citizens",    "EU, EU Citizens",    "EU, Nationals"]
-	getLineGroup(groupFindSubstring) {
-		const groupLines = this.shadowRoot.querySelectorAll(`#chart1 > svg  g.bb-chart-lines [class*=${groupFindSubstring}]`)
-		const focusElementIds = []
-		for(let j=0;j<groupLines.length;j++) {
-			groupLines[j].children[0].children[0].classList.forEach(e=>{
-				const bli = groupFindSubstring.replace("target","line")
-				if(e.startsWith(bli)) {
-					focusElementIds.push(e.replaceAll("--",", ").replaceAll("-"," ").replaceAll("target","line").slice(8))
-				}
-			})
-		}
-		return focusElementIds
 	}
 
 	indicateLoading() {
