@@ -20,7 +20,7 @@ const MS = {
 	height: "380px",
 	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
 	SVG_el_prefix: "bb-target-",
-	ID_NO_DATAPOINT: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
+	ID_NO_DATAPOINT_COUNTRYSERIES: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
 }
 
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
@@ -139,7 +139,8 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("switchTo2").addEventListener("click", (ev) => {
-			setTimeout(()=>this.#showChart1(false), 500)
+			//setTimeout(()=>this.#showChart1(false), 500)
+			this.#showChart1(false)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
 			Legend.resetCounter("switch to 2 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
@@ -291,7 +292,7 @@ class Element extends HTMLElement {
 				labelEveryTick: true,
 				onFinished: () => setTimeout(
 					()=>this.#resize(false, () => {
-						drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT)
+						drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
 						this.hiliteXAxisEntries(params.highlightIndices)
 					})
 				,50),
@@ -305,6 +306,7 @@ class Element extends HTMLElement {
 
 	#setLink(linkC) {
 		this.#$("sourceLink").setAttribute("href", linkC?this.#_srcLink1:this.#_srcLink2)
+		this.#$("sourceLink").setAttribute("target", "_blank")
 	}
 
 	toggleExpansion(relativeTo) {
