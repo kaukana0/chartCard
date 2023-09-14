@@ -70,7 +70,7 @@ export default class MarkUpCode {
 			<div id="slotContainerTop" style="display:none; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
 			<div id="switch" style="height:20px; text-align:right; display:none; margin-top:5px; margin-right:30px;">
 				<symbol-button id="switchTo1" symbol="lineChart" style="height: 25px; width: 25px; padding-right:20px;"></symbol-button>
-				<symbol-button id="switchTo2" symbol="barChart"  style="height: 25px; width: 25px;"></symbol-button>
+				<symbol-button id="switchTo2" symbol="dotPlot"  style="height: 25px; width: 25px;"></symbol-button>
 			</div>
 			<div style="display:flex;">
 				<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
