@@ -196,7 +196,6 @@ class Element extends HTMLElement {
 		const hidePos="1000px"
 		this.chart1.parentNode.style.top= show?showPos:hidePos
 		this.chart2.parentNode.style.top= !show?showPos:hidePos
-		this.#setLink(show)
 	}
 
 	setLegendDotColors(threeColors) {
@@ -269,7 +268,6 @@ class Element extends HTMLElement {
 				decimals: this.#_decimals,
 				padding: -0.4
 			})
-			this.#setLink(true)
 		}
 		Legend.resetCounter("setData1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 	}
@@ -304,8 +302,8 @@ class Element extends HTMLElement {
 		}
 	}
 
-	#setLink(linkC) {
-		this.#$("sourceLink").setAttribute("href", linkC?this.#_srcLink1:this.#_srcLink2)
+	switchSrcLink(isSrcLink1) {
+		this.#$("sourceLink").setAttribute("href", isSrcLink1?this.#_srcLink1:this.#_srcLink2)
 		this.#$("sourceLink").setAttribute("target", "_blank")
 	}
 
