@@ -23,6 +23,10 @@ const MS = {
 	ID_NO_DATAPOINT_COUNTRYSERIES: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
 }
 
+// chart container display
+const CCDISPLAY = Object.freeze({	CHART1:0, CHART2:1, LOADING:2, NOTAVAILALBE:3 })
+
+
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
 class Element extends HTMLElement {
 
@@ -42,6 +46,7 @@ class Element extends HTMLElement {
 	#_lineHoverCallback
 	#_infoText
 	#_decimals = 1
+	#_dataAvailable = false
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -62,7 +67,7 @@ class Element extends HTMLElement {
 			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()	+ MarkUpCode.legendCSS()
 		))
 		this.#_isExpanded = false
-		this.indicateLoading()
+		this.setChartContainerDisplay(CCDISPLAY.LOADING)
 		this.#_cardDims = [this.style.width, this.style.height]
 		this.#_isVisible = true
 		this.#_catchUp = [null,null]
@@ -140,7 +145,7 @@ class Element extends HTMLElement {
 
 		this.#$("switchTo2").addEventListener("click", (ev) => {
 			//setTimeout(()=>this.#showChart1(false), 500)
-			this.#showChart1(false)
+			this.setChartContainerDisplay(CCDISPLAY.CHART2)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
 			Legend.resetCounter("switch to 2 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
@@ -151,7 +156,7 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("switchTo1").addEventListener("click", (ev) => {
-			this.#showChart1(true)
+			this.setChartContainerDisplay(CCDISPLAY.CHART1)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
 			Legend.resetCounter("switch to 1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
@@ -187,15 +192,67 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
-		this.#showChart1(true)
+		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 	}
 
+
 	// billboard can't draw when display:none, so one solution is to move it out of sight
-	#showChart1(show) {
+	setChartContainerDisplay(display) {
 		const showPos="0px"
 		const hidePos="1000px"
-		this.chart1.parentNode.style.top= show?showPos:hidePos
-		this.chart2.parentNode.style.top= !show?showPos:hidePos
+
+		const [c1,c2,lo,u,le] = [this.chart1.parentNode.style, 
+			this.chart2.parentNode.style, 
+			this.#$("loadingMsg").parentNode.style,
+			this.#$("dataUnavailableMsg").parentNode.style,
+			this.shadowRoot.getElementById("contractedLegend")
+		]
+
+		switch(display) {
+			case CCDISPLAY.CHART1:
+				c1.top = showPos
+				c2.top = hidePos
+				lo.top = hidePos
+				u.top = hidePos
+				le.style.visibility = ""
+				break
+			case CCDISPLAY.CHART2:
+				c1.top = hidePos
+				c2.top = showPos
+				lo.top = hidePos
+				u.top = hidePos
+				le.style.visibility = ""
+				break
+			break
+			case CCDISPLAY.LOADING:
+				c1.top = hidePos
+				c2.top = hidePos
+				lo.top = showPos
+				u.top = hidePos
+				le.style.visibility = "hidden"
+				//this.shadowRoot.getElementById("chartContainer").classList.add("loading")
+				break
+			case CCDISPLAY.NOTAVAILALBE:
+				c1.top = hidePos
+				c2.top = hidePos
+				lo.top = hidePos
+				u.top = showPos
+				le.style.visibility = "hidden"
+				break
+			default:
+				console.error("")
+		}
+	}
+
+	#displayUnavailable() {
+		if(this.#_dataAvailable || this.#_isExpanded) {
+			const dataUnavailableDisplayed = this.#$("dataUnavailableMsg").parentNode.style.getPropertyValue("top")==="0px"
+			if(dataUnavailableDisplayed) {
+				this.setChartContainerDisplay(CCDISPLAY.CHART1)
+			}
+		} else {
+			this.setChartContainerDisplay(CCDISPLAY.NOTAVAILALBE)
+		}
 	}
 
 	setLegendDotColors(threeColors) {
@@ -241,13 +298,15 @@ class Element extends HTMLElement {
 			return " " + this.#_unitShort
 		}
 	}
-
+	
 	// line chart; please take note of comment on #resize().
 	// TODO: A ChartCard shouldn't make assumptions about what types of charts it has. Big refactoring neccessary for that.
 	setData1(params) {
 		if(!this.#_isVisible) {
 			this.#_catchUp[0] = params
 		} else {
+			this.#_dataAvailable = params.cols.length > 1
+			this.#displayUnavailable()
 			Chart.init({
 				chartDOMElementId: this.chart1,
 				type: "line",
@@ -373,6 +432,8 @@ class Element extends HTMLElement {
 
 		Legend.resetCounter("expand " + this.#id(), Chart.getUniqueId(this.chart1))
 
+		this.setChartContainerDisplay(CCDISPLAY.CHART1)
+
 		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
 		this.#resize(true, () => {
 			const event = new Event("expanding")
@@ -430,7 +491,7 @@ class Element extends HTMLElement {
 
 		Legend.resetCounter("contract"+this.#id(), Chart.getUniqueId(this.chart1))
 
-		this.#showChart1(true)
+		this.#displayUnavailable()
 
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
@@ -471,13 +532,6 @@ class Element extends HTMLElement {
 		}
 	}
 
-	indicateLoading() {
-		this.shadowRoot.getElementById("main").classList.add("loading")
-	}
-
-	stopIndicateLoading() {
-		this.shadowRoot.getElementById("main").classList.remove("loading")
-	}
 
 }
 

@@ -16,7 +16,9 @@ export default class MarkUpCode {
 				width:${w};
 				height:${h};
 				margin:10px;
+				padding:10px;
 				overflow: hidden;
+				background-color: white;
 			}
 			
 			.blueBorder {
@@ -61,9 +63,15 @@ export default class MarkUpCode {
 				stroke-width: 4.5px !important;
 			}
 
+			.na {
+				font-family: Arial,sans-serif;
+				font-size: 25px;
+				color:#4d6cc0;
+			}
+
 		</style>
 
-		<div tabindex="0" id="main" class="main blueBorder" style="padding:10px; background-color:white;">
+		<div tabindex="0" id="main" class="main blueBorder" style="">
 
 			<symbol-button id="close" symbol="close" style="float:right; display:none; margin-right:10px; margin-top:10px;"></symbol-button>
 
@@ -100,12 +108,18 @@ export default class MarkUpCode {
 			<!-- height modified by JS -->
 			<div style="height:66%; width:100%; position:relative;" id='chartContainer'>
 
-				<div style="top:0px; display:flex; background:white;">
-					<div id='chart1' style="flex-grow:1;"></div>
+				<div style="top:0px; display:flex; position:absolute; background:white;">
+					<div id='chart1'></div>
 					<div style="display:none; flex-direction: column; justify-content: flex-start; margin: 10px 50px 0 0" id='legend1'></div>
 				</div>
 				<div style="top:0px; position:absolute; background:white;">
 					<div id='chart2'></div>
+				</div>
+				<div style="top:0px; position:absolute; background:#f0f8ff; width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:6px;">
+					<div id='dataUnavailableMsg' class='na'>No data available</div>
+				</div>
+				<div style="top:0px; position:absolute; background:lightblue;">
+					<div id='loadingMsg'>Loading</div>
 				</div>
 	
 			</div>
