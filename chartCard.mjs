@@ -4,7 +4,8 @@ import * as Chart from "../chart/chart.mjs"
 import * as ChartGrid from "../chart/grid.mjs"
 import * as ChartAxis from "../chart/axis.mjs"
 import * as ChartTooltip from "../chart/tooltip.mjs"
-import * as Legend from "../../components/chart/legend.mjs"
+import * as LegendGroups from "./functionalities/legendGroups.mjs"
+import * as XCategoryAxis from "./functionalities/xCategoryAxis.mjs"
 
 import "../eclLikeModal/modal.mjs"
 import "../buttonX/button.mjs"
@@ -21,6 +22,7 @@ const MS = {
 	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
 	SVG_el_prefix: "bb-target-",
 	ID_NO_DATAPOINT_COUNTRYSERIES: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
+	FIRST_DIFFERENT: "EU, "
 }
 
 // chart container display
@@ -47,6 +49,12 @@ class Element extends HTMLElement {
 	#_infoText
 	#_decimals = 1
 	#_dataAvailable = false
+	#_display 				// one of CCDISPLAY
+	#_storedData1			// for comparison only
+	#_storedData2
+	#_resize1Ongoing = false	// for debugging, no functional purpose
+	#_resize2Ongoing = false
+
 
 	#$(elementId) {
 		return this.shadowRoot.getElementById(elementId)
@@ -93,14 +101,6 @@ class Element extends HTMLElement {
 		if(val) {
 			this.style.width=this.#_cardDims[0]
 			this.style.height=this.#_cardDims[1]
-			if(this.#_catchUp[0]) {
-				this.setData1(this.#_catchUp[0]) 
-				this.#_catchUp[0] = null
-			}
-			if(this.#_catchUp[1]) {
-				this.setData2(this.#_catchUp[1]) 
-				this.#_catchUp[1] = null
-			}
 			this.style.visibility="visible"
 		} else {
 			this.style.visibility="hidden"
@@ -144,11 +144,9 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("switchTo2").addEventListener("click", (ev) => {
-			//setTimeout(()=>this.#showChart1(false), 500)
 			this.setChartContainerDisplay(CCDISPLAY.CHART2)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
-			Legend.resetCounter("switch to 2 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 
 			const event = new Event("chartSwitched")
 			event["to"] = 2
@@ -159,7 +157,6 @@ class Element extends HTMLElement {
 			this.setChartContainerDisplay(CCDISPLAY.CHART1)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
-			Legend.resetCounter("switch to 1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
 
 			const event = new Event("chartSwitched")
 			event["to"] = 1
@@ -198,6 +195,8 @@ class Element extends HTMLElement {
 
 	// billboard can't draw when display:none, so one solution is to move it out of sight
 	setChartContainerDisplay(display) {
+		this.#_display = display
+
 		const showPos="0px"
 		const hidePos="1000px"
 
@@ -267,6 +266,11 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("statLegTxt3").textContent = threeTexts[2]
 	}
 
+	switchSrcLink(isSrcLink1) {
+		this.#$("sourceLink").setAttribute("href", isSrcLink1?this.#_srcLink1:this.#_srcLink2)
+		this.#$("sourceLink").setAttribute("target", "_blank")
+	}
+
 	static get observedAttributes() {
 		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "unitshort", "unitlong","srclink1", "srclink2", "articlelink", "infotext"]
 	}
@@ -300,13 +304,12 @@ class Element extends HTMLElement {
 	}
 	
 	// line chart; please take note of comment on #resize().
-	// TODO: A ChartCard shouldn't make assumptions about what types of charts it has. Big refactoring neccessary for that.
-	setData1(params) {
-		if(!this.#_isVisible) {
-			this.#_catchUp[0] = params
-		} else {
-			this.#_dataAvailable = params.cols.length > 1
-			this.#displayUnavailable()
+	// TODO: refactor: A ChartCard shouldn't make assumptions about what types of charts it has.
+	setData1(params, cb) {
+		this.#_dataAvailable = params.cols.length > 1
+		this.#displayUnavailable()
+		if(JSON.stringify(params.cols)!=this.#_storedData1)
+		{
 			Chart.init({
 				chartDOMElementId: this.chart1,
 				type: "line",
@@ -318,24 +321,28 @@ class Element extends HTMLElement {
 				seriesLabels: params.countryNamesFull,
 				suffixText: this.#getSuffix(),
 				tooltipFn: this.#_tooltipExtFn1,
-				onFinished: ()=>setTimeout(()=>this.#resize(true, () => {
-											MultilineFocus.addMultiLineFocus(this.shadowRoot, this.chart1, this.#_lineHoverCallback, MS.SVG_el_prefix)
-										}),50),
+				onFinished: ()=>{
+					this.#resize(true, () => {
+						MultilineFocus.addMultiLineFocus(this.shadowRoot, this.chart1, this.#_lineHoverCallback, MS.SVG_el_prefix)
+						if(cb) {cb()}
+					})
+				},
 				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
 					e ? MultilineFocus.getLineGroup(this.shadowRoot, MS.SVG_el_prefix+e.substring(0,2)) : e
 				)},
 				decimals: this.#_decimals,
 				padding: -0.4
 			})
+		} else {
+			if(cb) {cb()}
 		}
-		Legend.resetCounter("setData1 " + this.#id(), Chart.getUniqueId(this.chart1), 2)
+		this.#_storedData1 = JSON.stringify(params.cols)
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
-	setData2(params) {
-		if(!this.#_isVisible) {
-			this.#_catchUp[1] = params
-		} else {
+	setData2(params, cb) {
+		if(JSON.stringify(params.cols)!=this.#_storedData2)
+		{
 			Chart.init({
 				chartDOMElementId: this.chart2,
 				type: "line",
@@ -347,23 +354,25 @@ class Element extends HTMLElement {
 				showLines:false,
 				tooltipFn: this.#_tooltipExtFn2,
 				labelEveryTick: true,
-				onFinished: () => setTimeout(
-					()=>this.#resize(false, () => {
-						drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
-						this.hiliteXAxisEntries(params.highlightIndices)
+				onFinished: ()=>{
+					this.#resize(false, () => {
+						if(this.#_isVisible && this.#_isExpanded && this.#_display===CCDISPLAY.CHART2) {
+							drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
+						}
+						XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
+						if(cb) {cb()}
 					})
-				,50),
+				},
 				xAxisLabelBetween:false,
 				decimals: this.#_decimals,
 				padding: -0.2,
-				firstDifferent: "EU, "
+				firstDifferent: MS.FIRST_DIFFERENT
 			})
+		} else {
+			XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
+			if(cb) {cb()}
 		}
-	}
-
-	switchSrcLink(isSrcLink1) {
-		this.#$("sourceLink").setAttribute("href", isSrcLink1?this.#_srcLink1:this.#_srcLink2)
-		this.#$("sourceLink").setAttribute("target", "_blank")
+		this.#_storedData2 = JSON.stringify(params.cols)
 	}
 
 	toggleExpansion(relativeTo) {
@@ -430,8 +439,6 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, this.#_unitLong)
 		Chart.setYLabel(this.chart2, this.#_unitLong)
 
-		Legend.resetCounter("expand " + this.#id(), Chart.getUniqueId(this.chart1))
-
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 
 		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
@@ -489,9 +496,7 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, null)
 		Chart.setYLabel(this.chart2, null)
 
-		Legend.resetCounter("contract"+this.#id(), Chart.getUniqueId(this.chart1))
-
-		this.#displayUnavailable()
+		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 
 		// TODO: let's see if it works well w/o Promises.all
 		this.#resize(true, () => {
@@ -505,33 +510,39 @@ class Element extends HTMLElement {
 	// take care: billboard doesn't like to get fed data while resizing.
 	// it might lead to CPU overload and the site not responding to user input anymore.
 	#resize(firstChart, callback) {
-		if(this && this.shadowRoot) {
-			const r = this.shadowRoot.getElementById("chartContainer")
-			if(firstChart && this.chart1) {
-				const s = this.#_isExpanded ? -100 : Number(MS.shift)
-				Chart.resize(this.chart1, r.clientWidth+s, r.clientHeight, callback)
+		if(!this || !this.shadowRoot) {return}
+
+		const r = this.shadowRoot.getElementById("chartContainer")
+
+		if(firstChart && this.chart1) {
+			this.#$("legend1").style.paddingLeft="1000px"		// can't move, because flex item, can't hide because billboardjs doesn't append items when hidden
+
+			const s = this.#_isExpanded ? -100 : Number(MS.shift)
+			if(this.#_resize1Ongoing) {
+				console.warn("chartCard: async resize ongoing for chart1 ",this.#id())
+			} else {
+				this.#_resize1Ongoing=true
+				Chart.resize(this.chart1, r.clientWidth+s, r.clientHeight, ()=>{
+					this.#_resize1Ongoing=false
+					LegendGroups.dedupe(this.#$("legend1"))
+					this.#$("legend1").style.paddingLeft=""
+					if(callback) {callback()}
+				})
 			}
-			if(!firstChart && this.chart2) {
-				Chart.resize(this.chart2, r.clientWidth-Number(MS.shift), r.clientHeight, callback)
+		}
+
+		if(!firstChart && this.chart2) {
+			if(this.#_resize2Ongoing) {
+				console.warn("chartCard: async resize ongoing for chart2 ",this.#id())
+			} else {
+				this.#_resize2Ongoing=true
+				Chart.resize(this.chart2, r.clientWidth-Number(MS.shift), r.clientHeight, ()=>{
+					this.#_resize2Ongoing=false
+					if(callback) {callback()}
+				})
 			}
 		}
 	}
-
-
-	hiliteXAxisEntries(highlightIndices) {
-		const texts = this.shadowRoot.querySelector(`#chart2 > svg > g > g.bb-axis.bb-axis-x`).children
-		for(let i=1; i<texts.length; i++) {
-			const node = texts[i].childNodes[1]
-			if(node) {
-				if(highlightIndices.includes(i-1)) {
-					node.setAttribute("font-weight","bold")
-				} else {
-					node.removeAttribute("font-weight")
-				}
-			}
-		}
-	}
-
 
 }
 
