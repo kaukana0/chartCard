@@ -65,7 +65,7 @@ export default class MarkUpCode {
 
 			.na {
 				font-family: Arial,sans-serif;
-				font-size: 25px;
+				font-size: 22px;
 				color:#4d6cc0;
 			}
 
@@ -115,7 +115,7 @@ export default class MarkUpCode {
 				<div style="top:0px; position:absolute; background:white;">
 					<div id='chart2'></div>
 				</div>
-				<div style="top:0px; position:absolute; background:#f0f8ff; width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:6px;">
+				<div style="top:0px; position:absolute; background:#f0f8ff; width:100%; height:115%; display:flex; align-items:center; justify-content:center; border-radius:6px;">
 					<div id='dataUnavailableMsg' class='na'>No data available</div>
 				</div>
 				<div style="top:0px; position:absolute; background:lightblue;">

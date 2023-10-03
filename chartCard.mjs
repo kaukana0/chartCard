@@ -200,7 +200,8 @@ class Element extends HTMLElement {
 		const showPos="0px"
 		const hidePos="1000px"
 
-		const [c1,c2,lo,u,le] = [this.chart1.parentNode.style, 
+		const [c1,c2,lo,u,le] = [
+			this.chart1.parentNode.style, 
 			this.chart2.parentNode.style, 
 			this.#$("loadingMsg").parentNode.style,
 			this.#$("dataUnavailableMsg").parentNode.style,
@@ -213,30 +214,28 @@ class Element extends HTMLElement {
 				c2.top = hidePos
 				lo.top = hidePos
 				u.top = hidePos
-				le.style.visibility = ""
+				le.style.display = this.#_isExpanded ? "none" : "flex"
 				break
 			case CCDISPLAY.CHART2:
 				c1.top = hidePos
 				c2.top = showPos
 				lo.top = hidePos
 				u.top = hidePos
-				le.style.visibility = ""
+				le.style.display = "none"
 				break
-			break
 			case CCDISPLAY.LOADING:
 				c1.top = hidePos
 				c2.top = hidePos
 				lo.top = showPos
 				u.top = hidePos
-				le.style.visibility = "hidden"
-				//this.shadowRoot.getElementById("chartContainer").classList.add("loading")
+				le.style.display = "none"
 				break
 			case CCDISPLAY.NOTAVAILALBE:
 				c1.top = hidePos
 				c2.top = hidePos
 				lo.top = hidePos
 				u.top = showPos
-				le.style.visibility = "hidden"
+				le.style.display = "none"
 				break
 			default:
 				console.error("")

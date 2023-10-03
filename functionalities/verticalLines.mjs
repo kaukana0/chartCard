@@ -50,6 +50,8 @@ export default function drawVerticalLines(DOMRoot, highlightIndices, cols, noDat
   const out = DOMRoot.querySelector("#chart2 > svg  g.bb-chart-lines")
   out.insertAdjacentElement("afterbegin", g)	// behind the dots
 
+  removeSuperfluousHorizontalLines(DOMRoot)
+
   function firstNonZero(a,b,c) {	// return the first not zero, if any
     let x = a
     if(x===0) {x=b}
@@ -72,6 +74,13 @@ export default function drawVerticalLines(DOMRoot, highlightIndices, cols, noDat
 
     return [min,max]
   }
+}
+
+// no idea why they are there in the 1st place... 
+// they draw above the dots and exist only close to the bottom (mostly, it's just one 0-line)
+function removeSuperfluousHorizontalLines(DOMRoot) {
+  const lines = DOMRoot.querySelector("#chart2 > svg > g > g.bb-grid.bb-grid-lines > g.bb-ygrid-lines")
+  if(lines) { lines.remove() }
 }
 
 // assume number of dots for each of the 3 series are equal
