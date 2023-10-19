@@ -91,15 +91,15 @@ export default class MarkUpCode {
 			<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 
 			<span id="contractedLegend" style="margin-top:-15px; padding: 0px 30px 5px 30px; display:flex; flex-direction:column; justify-content:space-between; ">
-				<span>
+				<span id="contractedLegendItem1">
 					<span class="dot" id="dot1"></span>
 					<span id="statLegTxt1"></span>
 				</span>
-				<span>
+				<span id="contractedLegendItem2">
 					<span class="dot" id="dot2"></span>
 					<span id="statLegTxt2"></span>
 				</span>
-				<span>
+				<span id="contractedLegendItem3">
 					<span class="dot" id="dot3"></span>
 					<span id="statLegTxt3"></span>
 				</span>
