@@ -261,17 +261,17 @@ class Element extends HTMLElement {
 
 	setLegendTexts(threeTexts) {
 		if(threeTexts[0]==="") {
-			this.shadowRoot.getElementById("contractedLegendItem1").style.display = "none"
+			this.shadowRoot.getElementById("contractedLegendItem1").style.visibility = "hidden"
 		} else {
 			this.shadowRoot.getElementById("statLegTxt1").textContent = threeTexts[0]
 		}
 		if(threeTexts[1]==="") {
-			this.shadowRoot.getElementById("contractedLegendItem2").style.display = "none"
+			this.shadowRoot.getElementById("contractedLegendItem2").style.visibility = "hidden"
 		} else {
 			this.shadowRoot.getElementById("statLegTxt2").textContent = threeTexts[1]
 		}
 		if(threeTexts[2]==="") {
-			this.shadowRoot.getElementById("contractedLegendItem3").style.display = "none"
+			this.shadowRoot.getElementById("contractedLegendItem3").style.visibility = "hidden"
 		} else {
 			this.shadowRoot.getElementById("statLegTxt3").textContent = threeTexts[2]
 		}
