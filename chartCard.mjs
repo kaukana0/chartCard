@@ -6,6 +6,7 @@ import * as ChartAxis from "../chart/axis.mjs"
 import * as ChartTooltip from "../chart/tooltip.mjs"
 import * as LegendGroups from "./functionalities/legendGroups.mjs"
 import * as XCategoryAxis from "./functionalities/xCategoryAxis.mjs"
+import * as PopUpMessage from "../../js/view/modules/popUpMessage.mjs"		// TODO: get this out of here
 
 import "../eclLikeModal/modal.mjs"
 import "../buttonX/button.mjs"
@@ -72,7 +73,7 @@ class Element extends HTMLElement {
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
 		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
 			// standard chart tooltip css; can be overwritten
-			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()	+ MarkUpCode.legendCSS()
+			ChartGrid.gridCSSNewStyle() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()	+ MarkUpCode.legendCSS()
 		))
 		this.#_isExpanded = false
 		this.setChartContainerDisplay(CCDISPLAY.LOADING)
@@ -169,13 +170,22 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("downloadLink").addEventListener("click", (ev) => {
-			html2canvas(this.shadowRoot.getElementById("main")).then(function(canvas) {
-				const createEl = document.createElement('a');
-				createEl.href = canvas.toDataURL();
-				createEl.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png";
-				createEl.click();
-				createEl.remove();
-			});
+
+			PopUpMessage.show("Your image download is being prepared now.\nThis may take a while durig which the page is unresponsive.\nPlease hold on.",false,1000);
+
+			setTimeout(()=>{
+
+				html2canvas(this.shadowRoot.getElementById("main")).then(function(canvas) {
+					const createEl = document.createElement('a');
+					createEl.href = canvas.toDataURL();
+					createEl.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png";
+					createEl.click();
+					createEl.remove();
+					PopUpMessage.show("Your image is now downloaded.",true,null);
+				});
+
+			},100)
+
 			ev.stopPropagation()
 		})
 
