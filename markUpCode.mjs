@@ -128,7 +128,7 @@ export default class MarkUpCode {
 				<slot name="slotBottom"></slot>
 			</div>
 
-			<div id="bottomLine" style="display: none; height:40px; grid-template-columns: 1fr 1fr 1fr;">
+			<div id="bottomLine" style="display: none; height:40px; grid-template-columns: 1fr 1fr 1fr; margin-left:20px;">
 				<div id="slotContainerBottomLeft">
 					<slot name="slotBottomLeft"></slot>
 				</div>
