@@ -121,6 +121,8 @@ class Element extends HTMLElement {
 
 	set decimals(val) {this.#_decimals = val}
 
+	get chart1Displayed() {return this.#_display===CCDISPLAY.CHART1}
+
 	connectedCallback() {
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
