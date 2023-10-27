@@ -138,19 +138,22 @@ export default class MarkUpCode {
 					<a id="sourceLink"><span tabindex="0">access to dataset</span></a>
 				</p>
 
-				<div style="display:flex;">
+				<div style="display:flex; justify-content:flex-end; margin-right: 70px;">
+
 					<button id="downloadLink" class="ecl-button ecl-button--primary" type="button" style="width:140px; height: 45px; justify-self: right; margin: 5px">
 						<svg class="ecl-icon ecl-icon--xs ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="">
 							<use xlink:href="./redist/ecl/icons.svg#download"></use>
 						</svg>
 						<span class="ecl-button__label" data-ecl-label="true">Download</span>
 					</button>
-					<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:180px; height: 45px; justify-self: right; margin: 5px 30px;">
-						<span class="ecl-button__label" data-ecl-label="true">Read the article</span>
-							<svg class="ecl-icon ecl-icon--xs ecl-icon--rotate-90 ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="">
-								<use xlink:href="./redist/ecl/icons.svg#corner-arrow"></use>
-							</svg>
+
+					<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:155px; height: 45px; justify-self: right; margin: 5px 30px; padding:0; display:flex; align-items:center;">
+						<span style="flex-grow:1; padding:0;" class="" data-ecl-label="true">Read the article</span>
+						<svg class="ecl-icon ecl-icon--xs ecl-icon--rotate-90 ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="" style="margin: 0px 5px 0 0; padding:0;">
+							<use xlink:href="./redist/ecl/icons.svg#corner-arrow"></use>
+						</svg>
 					</button>
+
 				</div>
 				
 			</div>
