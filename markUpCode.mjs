@@ -138,7 +138,7 @@ export default class MarkUpCode {
 					<a id="sourceLink"><span tabindex="0">access to dataset</span></a>
 				</p>
 
-				<div style="display:flex; justify-content:flex-end; margin-right: 70px;">
+				<div style="display:flex; justify-content:flex-end; margin: 10px 70px;">
 
 					<button id="downloadLink" class="ecl-button ecl-button--primary" type="button" style="width:140px; height: 45px; justify-self: right; margin: 5px">
 						<svg class="ecl-icon ecl-icon--xs ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="">
