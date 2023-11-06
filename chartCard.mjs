@@ -73,7 +73,7 @@ class Element extends HTMLElement {
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
 		this.shadowRoot.appendChild(MarkUpCode.getHtmlTemplate(
 			// standard chart tooltip css; can be overwritten
-			ChartGrid.gridCSSNewStyle() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()	+ MarkUpCode.legendCSS()
+			ChartGrid.gridCSS() + ChartAxis.axisCSS() + ChartTooltip.tooltipCSS()	+ MarkUpCode.legendCSS()
 		))
 		this.#_isExpanded = false
 		this.setChartContainerDisplay(CCDISPLAY.LOADING)
