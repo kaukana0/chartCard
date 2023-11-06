@@ -196,9 +196,6 @@ export default class MarkUpCode {
 		return `
 		<style>
 		.bb-legend-item {
-			margin-top:2px;
-			/*padding-top: 0.1em; 
-			padding-bottom: 0.1em; */
 			padding-left: 2px;
 			text-align: left;	/* left alignment when besides chart */
 			font-family: Arial,sans-serif;
@@ -206,19 +203,16 @@ export default class MarkUpCode {
 		}
 		.coloredDot {
 			display: inline-block;
-			height: 24px;
-			width: 24px;
-			border-radius: 12px;
+			height: 26px;
+			width: 26px;
+			border-radius: 14px;
 		}
-		.disabledDot {
-			display: inline-block;
-			background-color: white !important;
+		.disabledDotLine {
+			border: 3px solid rgba(0,0,0,.2);
+			display: block;
+			position: absolute !important;
+			width: 25px;
 		}
-		/* a circle w/ a horiz. bar through */
-		.disabledDot::before {
-			content:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='170 400 404 248' width='2.0rem' height='2.0rem' stroke='blue' fill='lightgrey' %3E%3Cpath d='M 357.50586 401.1875 A 123.4485 123.4485 0 0 0 355.63672 401.19922 A 123.4485 123.4485 0 0 0 236.61133 498.91211 L 171.66211 498.91211 L 171.66211 553.89844 L 237.42188 553.89844 A 123.4485 123.4485 0 0 0 357.91992 648.08398 A 123.4485 123.4485 0 0 0 477.2793 553.89844 L 541.3457 553.89844 L 541.3457 498.91211 L 478.08789 498.91211 A 123.4485 123.4485 0 0 0 357.50586 401.1875 z'/%3E%3C/svg%3E");
-		}
-
 			</style>
 		`
 	}

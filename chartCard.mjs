@@ -392,6 +392,7 @@ class Element extends HTMLElement {
 				firstDifferent: MS.FIRST_DIFFERENT
 			})
 		} else {
+			drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
 			XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
 			if(cb) {cb()}
 		}
