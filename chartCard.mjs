@@ -23,12 +23,14 @@ const MS = {
 	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
 	SVG_el_prefix: "bb-target-",
 	ID_NO_DATAPOINT_COUNTRYSERIES: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
-	FIRST_DIFFERENT: "EU, "
+	FIRST_DIFFERENT: "EU, ",
+	HIDING_OFFSET: "50000px"
 }
 
 // chart container display
 const CCDISPLAY = Object.freeze({	CHART1:0, CHART2:1, LOADING:2, NOTAVAILALBE:3 })
 
+var debounceResizeTimer
 
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
 class Element extends HTMLElement {
@@ -44,7 +46,6 @@ class Element extends HTMLElement {
 	#_articleLink
 	#_cardDims
 	#_isVisible
-	#_catchUp					// if data was set when invisible, catch up on setting data when it becomes visible
 	#_userData				// possibility to associate some info to a card. not used by the card itself for anything.
 	#_lineHoverCallback
 	#_infoText
@@ -55,6 +56,7 @@ class Element extends HTMLElement {
 	#_storedData2
 	#_resize1Ongoing = false	// for debugging, no functional purpose
 	#_resize2Ongoing = false
+	#_firstSetDataCall = true
 
 
 	#$(elementId) {
@@ -79,7 +81,6 @@ class Element extends HTMLElement {
 		this.setChartContainerDisplay(CCDISPLAY.LOADING)
 		this.#_cardDims = [this.style.width, this.style.height]
 		this.#_isVisible = true
-		this.#_catchUp = [null,null]
 	}
 
 	get chart1() {
@@ -132,11 +133,15 @@ class Element extends HTMLElement {
 		})
 
 		this.shadowRoot.addEventListener('keydown', (ev) => {
-			if(ev.keyCode == 27) {
-				if(this.#_isExpanded) {
-					this.contract() 
-				}
-				ev.stopPropagation()
+			switch(ev.keyCode) {
+				case 27:
+					if(this.#_isExpanded) {	this.contract() }
+					ev.stopPropagation()
+					break;
+				case 13:
+					if(!this.#_isExpanded) {	this.expand() }
+					ev.stopPropagation()
+					break;
 			}
 		})
 
@@ -173,11 +178,21 @@ class Element extends HTMLElement {
 
 		this.#$("downloadLink").addEventListener("click", (ev) => {
 
-			PopUpMessage.show("Your image download is being prepared now.\nThis may take a while durig which the page is unresponsive.\nPlease hold on.",false,1000);
+			PopUpMessage.show("Your image download is being prepared now.\nThis may take a while during which the page is unresponsive.\nPlease hold on.",false,1000);
 
 			setTimeout(()=>{
 
-				html2canvas(this.shadowRoot.getElementById("main")).then(function(canvas) {
+				const opt = {
+					//windowWidth:"1500",
+					//windowHeight:"1024",
+					//width:"1500",
+					//height:"1024",
+					//scrollX:"0",
+					//scrollY:"1",
+					logging:false
+				}
+
+				html2canvas(this.shadowRoot.getElementById("main"), opt).then(function(canvas) {
 					const createEl = document.createElement('a');
 					createEl.href = canvas.toDataURL();
 					createEl.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png";
@@ -201,7 +216,30 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
+		//this.#installResizeObserver() doesnt work here
+
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
+	}
+
+	#installResizeObserver() {
+		const that = this
+		const ro = new ResizeObserver(entries => {
+
+			clearTimeout(debounceResizeTimer)
+		  debounceResizeTimer = setTimeout(function() {
+
+					that.#resize(true)
+
+					that.#resize(false)
+					if(that.#_isVisible && that.#_isExpanded && that.#_display===CCDISPLAY.CHART2) {
+						drawVerticalLines(that.shadowRoot, that.#_storedData2.highlightIndices, that.#_storedData2.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
+						XCategoryAxis.hilite(that.shadowRoot, that.#_storedData2.highlightIndices)
+					}
+
+				clearTimeout(debounceResizeTimer)
+			}, 250);
+		})
+		ro.observe(this.shadowRoot.querySelector(".main"))
 	}
 
 
@@ -210,7 +248,7 @@ class Element extends HTMLElement {
 		this.#_display = display
 
 		const showPos="0px"
-		const hidePos="1000px"
+		const hidePos=MS.HIDING_OFFSET
 
 		const [c1,c2,lo,u,le] = [
 			this.chart1.parentNode.style, 
@@ -222,31 +260,31 @@ class Element extends HTMLElement {
 
 		switch(display) {
 			case CCDISPLAY.CHART1:
-				c1.top = showPos
-				c2.top = hidePos
-				lo.top = hidePos
-				u.top = hidePos
+				c1.left = showPos
+				c2.left = hidePos
+				lo.left = hidePos
+				u.left = hidePos
 				le.style.display = this.#_isExpanded ? "none" : "flex"
 				break
 			case CCDISPLAY.CHART2:
-				c1.top = hidePos
-				c2.top = showPos
-				lo.top = hidePos
-				u.top = hidePos
+				c1.left = hidePos
+				c2.left = showPos
+				lo.left = hidePos
+				u.left = hidePos
 				le.style.display = "none"
 				break
 			case CCDISPLAY.LOADING:
-				c1.top = hidePos
-				c2.top = hidePos
-				lo.top = showPos
-				u.top = hidePos
+				c1.left = hidePos
+				c2.left = hidePos
+				lo.left = showPos
+				u.left = hidePos
 				le.style.display = "none"
 				break
 			case CCDISPLAY.NOTAVAILALBE:
-				c1.top = hidePos
-				c2.top = hidePos
-				lo.top = hidePos
-				u.top = showPos
+				c1.left = hidePos
+				c2.left = hidePos
+				lo.left = hidePos
+				u.left = showPos
 				le.style.display = "none"
 				break
 			default:
@@ -256,7 +294,7 @@ class Element extends HTMLElement {
 
 	#displayUnavailable() {
 		if(this.#_dataAvailable || this.#_isExpanded) {
-			const dataUnavailableDisplayed = this.#$("dataUnavailableMsg").parentNode.style.getPropertyValue("top")==="0px"
+			const dataUnavailableDisplayed = this.#$("dataUnavailableMsg").parentNode.style.getPropertyValue("left")==="0px"
 			if(dataUnavailableDisplayed) {
 				this.setChartContainerDisplay(CCDISPLAY.CHART1)
 			}
@@ -295,7 +333,7 @@ class Element extends HTMLElement {
 	}
 
 	static get observedAttributes() {
-		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "unitshort", "unitlong","srclink1", "srclink2", "articlelink", "infotext"]
+		return ["anchor", "header_c", "header_e", "subtitle_e", "subtitle_c", "right1", "right2", "unitshort", "unitlong","srclink1", "srclink2", "articlelink", "infotext", "offsety"]
 	}
 
 	attributeChangedCallback(name, oldVal, newVal) {
@@ -315,6 +353,10 @@ class Element extends HTMLElement {
 		if(name==="srclink2") { this.#_srcLink2 = newVal }
 		if(name==="srclink1") {	this.#_srcLink1 = newVal }
 		if(name==="infotext") { this.#_infoText = newVal }
+		if(name==="offsety") { 
+			this.shadowRoot.getElementById("main").style.setProperty('--offsety', newVal)
+		}
+		
 	}
 
 	// "%" should be directly after the number, "PPS" for instance separated by a space
@@ -333,6 +375,10 @@ class Element extends HTMLElement {
 		this.#displayUnavailable()
 		if(JSON.stringify(params.cols)!=this.#_storedData1)
 		{
+			if(this.#_firstSetDataCall) {
+				this.#_firstSetDataCall = false
+				this.#installResizeObserver()
+			}
 			Chart.init({
 				chartDOMElementId: this.chart1,
 				type: "line",
@@ -364,7 +410,7 @@ class Element extends HTMLElement {
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
 	setData2(params, cb) {
-		if(JSON.stringify(params.cols)!=this.#_storedData2)
+		if(!this.#_storedData2 || (JSON.stringify(params.cols)!=JSON.stringify(this.#_storedData2.cols)))
 		{
 			Chart.init({
 				chartDOMElementId: this.chart2,
@@ -396,7 +442,7 @@ class Element extends HTMLElement {
 			XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
 			if(cb) {cb()}
 		}
-		this.#_storedData2 = JSON.stringify(params.cols)
+		this.#_storedData2 = structuredClone(params) //JSON.stringify(params)
 	}
 
 	toggleExpansion(relativeTo) {
@@ -412,7 +458,7 @@ class Element extends HTMLElement {
 		if(this.#_isExpanded) return
 
 		const div = this.shadowRoot.querySelector(".main")
-		const sroot = this
+		const sroot = this.shadowRoot.host
 
 		this.storedStyles = {
 			chart: Object.assign({}, this.chart1.style), 
@@ -420,31 +466,28 @@ class Element extends HTMLElement {
 			sroot:Object.assign({}, sroot.style)
 		}
 
-		sroot.style.position="fixed"
+
+		sroot.style.position="absolute"
 		sroot.style.zIndex="1"
+		sroot.style.left="0px"
 
-		//div.style.transition="width 0.8s"
-		//div.style.transition="height 0.2s"
-		//this.chart1.firstElementChild.style.marginLeft=""
-		//console.log(this.chart1.firstElementChild)
+		div.style.display="block"
+		div.style.width = "calc(100vw - 70px)"
+		div.style.height = "calc(100dvh - var(--offsety))"
 
-		div.style.position="fixed"
-		div.style.width="99%"
-		div.style.height= window.innerHeight - relativeTo.getBoundingClientRect().bottom - window.scrollY + "px"
-		div.style.top="-10px"
-		div.style.left="-10px"
 		div.style.borderRadius=0
 
-		this.shadowRoot.getElementById("slotContainerTop").style.display="inline"
+		this.shadowRoot.getElementById("slotContainerTop").style.display="block"
 		this.shadowRoot.getElementById("slotContainerBottom").style.display="inline"
-		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="inline"
-		this.shadowRoot.getElementById("close").style.display="inline"
-		this.shadowRoot.getElementById("switch").style.display="block"
+		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="flex"
+		this.shadowRoot.getElementById("close").style.display="block"
+		this.shadowRoot.getElementById("switch").style.display=""
 		this.shadowRoot.getElementById("contractedLegend").style.display="none"
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
-		this.shadowRoot.getElementById("bottomLine").style.display="grid"
+		this.shadowRoot.getElementById("bottomLine").style.display="flex"
 		this.shadowRoot.getElementById("chartContainer").style.height="55%"
+		this.shadowRoot.getElementById("main").style.overflowY="auto"	
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
@@ -452,6 +495,7 @@ class Element extends HTMLElement {
 			console.error("chartCard: no line chart "+this.#id())
 		}
 		this.shadowRoot.getElementById("main").classList.remove("blueBorder")
+		this.shadowRoot.getElementById("main").classList.add("noMargin")
 		this.shadowRoot.getElementById("info").style.display="inline"
 		this.shadowRoot.getElementById("subtitle_c").style.display="none"
 		this.shadowRoot.getElementById("subtitle_e").style.display="block"
@@ -487,10 +531,11 @@ class Element extends HTMLElement {
 		div.style.position=""
 		div.style.width=MS.width
 		div.style.height=MS.height
-		div.style.top=""
+		div.style.left=""
 		div.style.left=""
 		div.style.zIndex=""
 		div.style.borderRadius=this.storedStyles.div.borderRadius
+		div.scrollTop=0
 
 		this.shadowRoot.getElementById("slotContainerTop").style.display="none"
 		this.shadowRoot.getElementById("slotContainerBottom").style.display="none"
@@ -502,6 +547,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
 		this.shadowRoot.getElementById("chartContainer").style.height="66%"		// when modifying this, also modify html in MarkUpCode
+		this.shadowRoot.getElementById("main").style.overflowY="hidden"
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft=`-${MS.shift}px`
@@ -509,6 +555,7 @@ class Element extends HTMLElement {
 			console.error("chartCard: no dot plot chart"+this.#id())
 		}
 		this.shadowRoot.getElementById("main").classList.add("blueBorder")
+		this.shadowRoot.getElementById("main").classList.remove("noMargin")
 		this.shadowRoot.getElementById("info").style.display="none"
 		this.shadowRoot.getElementById("subtitle_c").style.display="block"
 		this.shadowRoot.getElementById("subtitle_e").style.display="none"
@@ -536,10 +583,10 @@ class Element extends HTMLElement {
 	#resize(firstChart, callback) {
 		if(!this || !this.shadowRoot) {return}
 
-		const r = this.shadowRoot.getElementById("chartContainer")
+		const r = this.shadowRoot.getElementById("chartContainer")		// scream
 
 		if(firstChart && this.chart1) {
-			this.#$("legend1").style.paddingLeft="1000px"		// can't move, because flex item, can't hide because billboardjs doesn't append items when hidden
+			this.#$("legend1").style.paddingLeft=MS.HIDING_OFFSET		// can't move, because flex item, can't hide because billboardjs doesn't append items when hidden
 
 			const s = this.#_isExpanded ? -100 : Number(MS.shift)
 			if(this.#_resize1Ongoing) {
@@ -551,6 +598,7 @@ class Element extends HTMLElement {
 					LegendGroups.dedupe(this.#$("legend1"))
 					this.#$("legend1").style.paddingLeft=""
 					if(callback) {callback()}
+					Chart.nullifyCallback(this.chart1)
 				})
 			}
 		}
@@ -563,6 +611,7 @@ class Element extends HTMLElement {
 				Chart.resize(this.chart2, r.clientWidth-Number(MS.shift), r.clientHeight, ()=>{
 					this.#_resize2Ongoing=false
 					if(callback) {callback()}
+					Chart.nullifyCallback(this.chart2)
 				})
 			}
 		}
