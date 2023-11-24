@@ -144,8 +144,8 @@ export default class MarkUpCode {
 				</div>
 					
 				<div style="display:flex; flex-direction:column;">
-					<h2 id="header_e" style="display:none; height:auto; margin: 3px 10px 3px;">${titleLong}</h2>
-					<div id="subtitle_e" style="display:none; height:5%; margin: 3px 10px 3px;">Subtitle</div>
+					<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
+					<div id="subtitle_e" style="display:none; height:5%; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
 
 				<symbol-button id="info" symbol="info" style="display:none; margin-right:5px; flex-grow:1; align-self:center;" tabindex="0"></symbol-button>
