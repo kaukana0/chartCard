@@ -49,7 +49,6 @@ export default class MarkUpCode {
 
 			.thick-line { stroke-width: 3.5px; }
 
-
 			#chart1 > svg {
 				margin-left: -${shift}px;
 			}
@@ -183,7 +182,7 @@ export default class MarkUpCode {
 			<div id="row6" style="display:flex; width:100%;" class="dbg"></div>
 
 			<!-- row7; height modified by JS -->
-			<div id='chartContainer' style="width:100%; height:66%; position:relative; display:flex;" class="dbg">
+			<div id='chartContainer' style="width:100%; height:62%; position:relative; display:flex;" class="dbg">
 
 					<div id="scream" style="top:0px; display:flex; position:absolute; background:white;">
 						<div id='chart1' style="flex-grow:1;"></div>

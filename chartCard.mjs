@@ -400,7 +400,7 @@ class Element extends HTMLElement {
 					e ? MultilineFocus.getLineGroup(this.shadowRoot, MS.SVG_el_prefix+e.substring(0,2)) : e
 				)},
 				decimals: this.#_decimals,
-				padding: -0.4
+				padding: -0.4,
 			})
 		} else {
 			if(cb) {cb()}
@@ -435,7 +435,8 @@ class Element extends HTMLElement {
 				xAxisLabelBetween:false,
 				decimals: this.#_decimals,
 				padding: -0.2,
-				firstDifferent: MS.FIRST_DIFFERENT
+				firstDifferent: MS.FIRST_DIFFERENT,
+				minMaxY: {min:params.meta.smallestValue, max:params.meta.biggestValue}
 			})
 		} else {
 			drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
@@ -490,7 +491,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("main").style.overflowY="auto"	
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
-			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="0px"
+			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="-20px"
 		} else {
 			console.error("chartCard: no line chart "+this.#id())
 		}
@@ -546,7 +547,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
-		this.shadowRoot.getElementById("chartContainer").style.height="66%"		// when modifying this, also modify html in MarkUpCode
+		this.shadowRoot.getElementById("chartContainer").style.height="62%"		// when modifying this, also modify html in MarkUpCode
 		this.shadowRoot.getElementById("main").style.overflowY="hidden"
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
