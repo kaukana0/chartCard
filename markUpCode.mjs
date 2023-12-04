@@ -122,7 +122,6 @@ export default class MarkUpCode {
 				#main {
 					width:300px;
 					height:300px;
-					background-color: aliceblue;
 				}
 				#chartContainer {
 					max-height:50%;
