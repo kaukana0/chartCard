@@ -18,19 +18,21 @@ import drawVerticalLines from "./functionalities/verticalLines.mjs"
 
 // magic strings
 const MS = {
-	width: "380px",
-	height: "380px",
+	dimNarrow: {width: "300px", height: "300px"},
+	dimFull: {width: "380px", height: "380px"},
+	heightNarrow: {exp:"55%", con:"50%"},
+	heightFull: {exp:"55%", con:"62%"},
+
 	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
 	SVG_el_prefix: "bb-target-",
 	ID_NO_DATAPOINT_COUNTRYSERIES: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
 	FIRST_DIFFERENT: "EU, ",
-	HIDING_OFFSET: "50000px"
+	HIDING_OFFSET: "50000px",
 }
 
 // chart container display
 const CCDISPLAY = Object.freeze({	CHART1:0, CHART2:1, LOADING:2, NOTAVAILALBE:3 })
 
-var debounceResizeTimer
 
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
 class Element extends HTMLElement {
@@ -44,7 +46,6 @@ class Element extends HTMLElement {
 	#_srcLink1
 	#_srcLink2
 	#_articleLink
-	#_cardDims
 	#_isVisible
 	#_userData				// possibility to associate some info to a card. not used by the card itself for anything.
 	#_lineHoverCallback
@@ -57,6 +58,7 @@ class Element extends HTMLElement {
 	#_resize1Ongoing = false	// for debugging, no functional purpose
 	#_resize2Ongoing = false
 	#_firstSetDataCall = true
+	#_debounceResizeTimer
 
 
 	#$(elementId) {
@@ -69,7 +71,7 @@ class Element extends HTMLElement {
 		super()
 		this.attachShadow({mode: 'open'})
 		const tmp = MarkUpCode.getHtmlTemplate(
-				MarkUpCode.mainElements("No title", "No title", MS.width, MS.height, MS.shift)
+				MarkUpCode.mainElements("No title", "No title", MS.dimFull.width, MS.dimFull.height, MS.shift)
 			).cloneNode(true)
 		this.shadowRoot.appendChild(tmp)
 		// we need to get all the CSS' in here, because in light DOM they don't have any influence on the charts contained within
@@ -79,7 +81,6 @@ class Element extends HTMLElement {
 		))
 		this.#_isExpanded = false
 		this.setChartContainerDisplay(CCDISPLAY.LOADING)
-		this.#_cardDims = [this.style.width, this.style.height]
 		this.#_isVisible = true
 	}
 
@@ -97,17 +98,19 @@ class Element extends HTMLElement {
 		this.setAttribute("anchor",val)
 	}
 
-	// billboard can't draw when display:none and moving out of doesn't always not work (e.g. if this card is used as a flex-item)
+	// billboard can't draw when display:none and moving out of view doesn't always not work (e.g. if this card is used as a flex-item)
 	set isVisible(val) {
 		this.#_isVisible = val
 		if(val) {
-			this.style.width=this.#_cardDims[0]
-			this.style.height=this.#_cardDims[1]
+			this.style.maxWidth=""
+			this.style.maxHeight=""
 			this.style.visibility="visible"
+			this.shadowRoot.getElementById("main").classList.remove("hideCard")
 		} else {
+			this.shadowRoot.getElementById("main").classList.add("hideCard")
 			this.style.visibility="hidden"
-			this.style.width="0"
-			this.style.height="0"
+			this.style.maxWidth="0px"
+			this.style.maxHeight="0px"
 		}
 	}
 
@@ -208,38 +211,65 @@ class Element extends HTMLElement {
 
 		this.#$("info").addEventListener("click", (ev) => {
 			// TODO: this is a workaround. 
-			// don't use a global modal (at least not in this way) but fix the problem here that exists because in this app,
-			// "fixed" is relative to a div specified in index.html, rather than the screen.
+			// don't use a global modal (at least not in this way)
 			document.getElementById("globalModal").setHeader("Information")
 			document.getElementById("globalModal").setText(this.#_infoText)
 			document.getElementById("globalModal").show()
 			ev.stopPropagation()
 		})
 
-		//this.#installResizeObserver() doesnt work here
+		// doing it here triggers resize immediately and
+		// then comes a resize from init process that gets lost.
+		// best be done after everything has settled.
+		//this.#installResizeObserver()
 
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 	}
 
 	#installResizeObserver() {
+		this.ro = new ResizeObserver(this.#onResizeObserver.bind(this))
+		this.ro.observe(this)
+	}
+
+	#onResizeObserver() {
 		const that = this
-		const ro = new ResizeObserver(entries => {
 
-			clearTimeout(debounceResizeTimer)
-		  debounceResizeTimer = setTimeout(function() {
+		clearTimeout(this.#_debounceResizeTimer)
+		this.#_debounceResizeTimer = setTimeout(function() {
 
-					that.#resize(true)
+			that.#resize(true)
 
-					that.#resize(false)
-					if(that.#_isVisible && that.#_isExpanded && that.#_display===CCDISPLAY.CHART2) {
-						drawVerticalLines(that.shadowRoot, that.#_storedData2.highlightIndices, that.#_storedData2.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
-						XCategoryAxis.hilite(that.shadowRoot, that.#_storedData2.highlightIndices)
-					}
+			that.#resize(false)
+			if(that.#_isVisible && that.#_isExpanded && that.#_display===CCDISPLAY.CHART2) {
+				drawVerticalLines(that.shadowRoot, that.#_storedData2.highlightIndices, that.#_storedData2.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
+				XCategoryAxis.hilite(that.shadowRoot, that.#_storedData2.highlightIndices)
+			}
 
-				clearTimeout(debounceResizeTimer)
-			}, 250);
-		})
-		ro.observe(this.shadowRoot.querySelector(".main"))
+			that.#moveHeaderButtons(that.#isNarrowScreen())
+
+			clearTimeout(that.#_debounceResizeTimer)
+		}, 250)
+
+	}
+
+	#moveHeaderButtons(toRow2) {
+		const a = this.shadowRoot.getElementById("info")
+		const b = this.shadowRoot.getElementById("switch")
+		if(toRow2) {
+			this.shadowRoot.getElementById("row2").append(a)
+			this.shadowRoot.getElementById("row2").append(b)
+		} else {
+			this.shadowRoot.getElementById("row3").append(a)
+			this.shadowRoot.getElementById("row3").append(b)
+		}
+	}
+
+	#isNarrowScreen() {
+		return document.documentElement.clientWidth<995
+	}
+
+	#isVeryNarrowScreen() {
+		return document.documentElement.clientWidth<529
 	}
 
 
@@ -375,10 +405,6 @@ class Element extends HTMLElement {
 		this.#displayUnavailable()
 		if(JSON.stringify(params.cols)!=this.#_storedData1)
 		{
-			if(this.#_firstSetDataCall) {
-				this.#_firstSetDataCall = false
-				this.#installResizeObserver()
-			}
 			Chart.init({
 				chartDOMElementId: this.chart1,
 				type: "line",
@@ -430,6 +456,12 @@ class Element extends HTMLElement {
 						}
 						XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
 						if(cb) {cb()}
+
+						if(this.#_firstSetDataCall) {
+							this.#_firstSetDataCall = false
+							this.#installResizeObserver()
+						}
+
 					})
 				},
 				xAxisLabelBetween:false,
@@ -487,7 +519,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="flex"
-		this.shadowRoot.getElementById("chartContainer").style.height="55%"
+		this.shadowRoot.getElementById("chartContainer").style.height = this.#isVeryNarrowScreen()?MS.heightNarrow.exp:MS.heightFull.exp   //"55%"
 		this.shadowRoot.getElementById("main").style.overflowY="auto"	
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
@@ -530,8 +562,8 @@ class Element extends HTMLElement {
 		sroot.style.height=""
 
 		div.style.position=""
-		div.style.width=MS.width
-		div.style.height=MS.height
+		div.style.width=""
+		div.style.height=""
 		div.style.left=""
 		div.style.left=""
 		div.style.zIndex=""
@@ -547,7 +579,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
-		this.shadowRoot.getElementById("chartContainer").style.height="62%"		// when modifying this, also modify html in MarkUpCode
+		this.shadowRoot.getElementById("chartContainer").style.height =	this.#isVeryNarrowScreen()?MS.heightNarrow.con:MS.heightFull.con	// "62%"		// when modifying this, also modify html in MarkUpCode
 		this.shadowRoot.getElementById("main").style.overflowY="hidden"
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
@@ -589,18 +621,24 @@ class Element extends HTMLElement {
 		if(firstChart && this.chart1) {
 			this.#$("legend1").style.paddingLeft=MS.HIDING_OFFSET		// can't move, because flex item, can't hide because billboardjs doesn't append items when hidden
 
-			const s = this.#_isExpanded ? -100 : Number(MS.shift)
 			if(this.#_resize1Ongoing) {
 				console.warn("chartCard: async resize ongoing for chart1 ",this.#id())
 			} else {
-				this.#_resize1Ongoing=true
-				Chart.resize(this.chart1, r.clientWidth+s, r.clientHeight, ()=>{
-					this.#_resize1Ongoing=false
-					LegendGroups.dedupe(this.#$("legend1"))
-					this.#$("legend1").style.paddingLeft=""
+
+				const width = r.clientWidth + ( this.#_isExpanded ? -100 : Number(MS.shift) )
+				if(width>0) {
+					this.#_resize1Ongoing=true
+					Chart.resize(this.chart1, width, r.clientHeight, ()=>{
+						this.#_resize1Ongoing=false
+						LegendGroups.dedupe(this.#$("legend1"))
+						this.#$("legend1").style.paddingLeft=""
+						if(callback) {callback()}
+						Chart.nullifyCallback(this.chart1)
+					})
+				} else {
 					if(callback) {callback()}
-					Chart.nullifyCallback(this.chart1)
-				})
+				}
+
 			}
 		}
 
@@ -608,12 +646,19 @@ class Element extends HTMLElement {
 			if(this.#_resize2Ongoing) {
 				console.warn("chartCard: async resize ongoing for chart2 ",this.#id())
 			} else {
-				this.#_resize2Ongoing=true
-				Chart.resize(this.chart2, r.clientWidth-Number(MS.shift), r.clientHeight, ()=>{
-					this.#_resize2Ongoing=false
+
+				const width = r.clientWidth-Number(MS.shift)
+				if(width>0) {
+					this.#_resize2Ongoing=true
+					Chart.resize(this.chart2, width, r.clientHeight, ()=>{
+						this.#_resize2Ongoing=false
+						if(callback) {callback()}
+						Chart.nullifyCallback(this.chart2)
+					})
+				} else {
 					if(callback) {callback()}
-					Chart.nullifyCallback(this.chart2)
-				})
+				}
+
 			}
 		}
 	}

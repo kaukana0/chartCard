@@ -118,6 +118,29 @@ export default class MarkUpCode {
 				}
 			}
 
+			@media (max-width: 529px) {
+				#main {
+					width:300px;
+					height:300px;
+					background-color: aliceblue;
+				}
+				#chartContainer {
+					max-height:50%;
+				}
+				h2 {
+					font-size:1.2em;
+				}
+			}
+
+			#chartContainer {
+				height:62%;
+			}
+
+			.hideCard {
+				width:0px !important;
+				height:0px !important;
+			}
+
 		</style>
 
 
@@ -132,14 +155,14 @@ export default class MarkUpCode {
 				<symbol-button id="close" symbol="close" style="width:30px; display:none; margin:40px 50px;" tabindex="0"></symbol-button>
 			</div>
 
-			<!-- headers, buttons are moved here on narrow width -->
+			<!-- headers' buttons are moved here on narrow width -->
 			<div id="row2" style="display:flex; width:100%;" class="dbg"></div>
 
 			<!-- headers, buttons -->
 			<div id="row3" style="display:flex; width:100%;" class="dbg">
 				<div style="display:flex; flex-direction:column;">
 					<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
-					<div id="subtitle_c" style="height:5%; margin-left:3px;"></div>
+					<div id="subtitle_c" style="height:5%; margin-left:3px;">...</div>
 				</div>
 					
 				<div style="display:flex; flex-direction:column;">
@@ -157,7 +180,7 @@ export default class MarkUpCode {
 
 			<!-- text right (country in overview) -->
 			<div id="row4" style="width:100%;" class="dbg">
-				<div id="right1" style="height:5%; text-align:right; color:#0e47cb"></div>
+				<div id="right1" style="height:5%; text-align:right; color:#0e47cb">...</div>
 				<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 			</div>
 
@@ -182,7 +205,7 @@ export default class MarkUpCode {
 			<div id="row6" style="display:flex; width:100%;" class="dbg"></div>
 
 			<!-- row7; height modified by JS -->
-			<div id='chartContainer' style="width:100%; height:62%; position:relative; display:flex;" class="dbg">
+			<div id='chartContainer' style="width:100%; position:relative; display:flex;" class="dbg">
 
 					<div id="scream" style="top:0px; display:flex; position:absolute; background:white;">
 						<div id='chart1' style="flex-grow:1;"></div>
