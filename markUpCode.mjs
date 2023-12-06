@@ -112,7 +112,7 @@ export default class MarkUpCode {
 			@media (orientation:portrait), (max-width: 1180px) {
 				#downloadLink {display:none;}
 			}
-			@media (max-width: 540px) {
+			@media (max-width: 995px) {
 				#close {
 					visibility: hidden;
 				}
