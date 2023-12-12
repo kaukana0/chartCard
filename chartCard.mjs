@@ -378,7 +378,6 @@ class Element extends HTMLElement {
 	// line chart; please take note of comment on #resize().
 	// TODO: refactor: A ChartCard shouldn't make assumptions about what types of charts it has.
 	setData1(params, cb) {
-		if(!this.#_isVisible) {return}
 		this.#_dataAvailable = params.cols.length > 1
 		this.#displayUnavailable()
 		Chart.init({
@@ -411,7 +410,6 @@ class Element extends HTMLElement {
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
 	setData2(params, cb) {
-		if(!this.#_isVisible) {return}
 		Chart.init({
 			chartDOMElementId: this.chart2,
 			type: "line",
