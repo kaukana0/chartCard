@@ -53,12 +53,6 @@ class Element extends HTMLElement {
 	#_decimals = 1
 	#_dataAvailable = false
 	#_display 				// one of CCDISPLAY
-	#_storedData1			// for comparison only
-	#_storedData2
-	#_resize1Ongoing = false	// for debugging, no functional purpose
-	#_resize2Ongoing = false
-	#_firstSetDataCall = true
-	#_debounceResizeTimer
 
 
 	#$(elementId) {
@@ -102,15 +96,9 @@ class Element extends HTMLElement {
 	set isVisible(val) {
 		this.#_isVisible = val
 		if(val) {
-			this.style.maxWidth=""
-			this.style.maxHeight=""
-			this.style.visibility="visible"
-			this.shadowRoot.getElementById("main").classList.remove("hideCard")
+			this.style.display=""
 		} else {
-			this.shadowRoot.getElementById("main").classList.add("hideCard")
-			this.style.visibility="hidden"
-			this.style.maxWidth="0px"
-			this.style.maxHeight="0px"
+			this.style.display="none"
 		}
 	}
 
@@ -155,6 +143,8 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("switchTo2").addEventListener("click", (ev) => {
+			if(!this.chart1Displayed) {return}
+
 			this.setChartContainerDisplay(CCDISPLAY.CHART2)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
@@ -165,6 +155,8 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("switchTo1").addEventListener("click", (ev) => {
+			if(this.chart1Displayed) {return}
+
 			this.setChartContainerDisplay(CCDISPLAY.CHART1)
 			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
@@ -218,10 +210,8 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
-		// doing it here triggers resize immediately and
-		// then comes a resize from init process that gets lost.
-		// best be done after everything has settled.
-		//this.#installResizeObserver()
+		// note: doing it here triggers resize immediately
+		this.#installResizeObserver()
 
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 	}
@@ -232,35 +222,23 @@ class Element extends HTMLElement {
 	}
 
 	#onResizeObserver() {
-		const that = this
-
-		clearTimeout(this.#_debounceResizeTimer)
-		this.#_debounceResizeTimer = setTimeout(function() {
-
-			that.#resize(true)
-
-			that.#resize(false)
-			if(that.#_isVisible && that.#_isExpanded && that.#_display===CCDISPLAY.CHART2) {
-				drawVerticalLines(that.shadowRoot, that.#_storedData2.highlightIndices, that.#_storedData2.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
-				XCategoryAxis.hilite(that.shadowRoot, that.#_storedData2.highlightIndices)
-			}
-
-			that.#moveHeaderButtons(that.#isNarrowScreen())
-
-			clearTimeout(that.#_debounceResizeTimer)
-		}, 250)
-
+		Chart.flush(this.chart1)
+		Chart.flush(this.chart2)
+		this.#moveHeaderButtons(this.#isNarrowScreen())
 	}
 
 	#moveHeaderButtons(toRow2) {
 		const a = this.shadowRoot.getElementById("info")
-		const b = this.shadowRoot.getElementById("switch")
+		const b = this.shadowRoot.getElementById("switchTo1")
+		const c = this.shadowRoot.getElementById("switchTo2")
 		if(toRow2) {
 			this.shadowRoot.getElementById("row2").append(a)
 			this.shadowRoot.getElementById("row2").append(b)
+			this.shadowRoot.getElementById("row2").append(c)
 		} else {
-			this.shadowRoot.getElementById("row3").append(a)
-			this.shadowRoot.getElementById("row3").append(b)
+			this.shadowRoot.getElementById("row3header").append(a)
+			this.shadowRoot.getElementById("switch").append(b)
+			this.shadowRoot.getElementById("switch").append(c)
 		}
 	}
 
@@ -273,12 +251,11 @@ class Element extends HTMLElement {
 	}
 
 
-	// billboard can't draw when display:none, so one solution is to move it out of sight
 	setChartContainerDisplay(display) {
 		this.#_display = display
 
-		const showPos="0px"
-		const hidePos=MS.HIDING_OFFSET
+		const showPos=""
+		const hidePos="none"
 
 		const [c1,c2,lo,u,le] = [
 			this.chart1.parentNode.style, 
@@ -290,31 +267,31 @@ class Element extends HTMLElement {
 
 		switch(display) {
 			case CCDISPLAY.CHART1:
-				c1.left = showPos
-				c2.left = hidePos
-				lo.left = hidePos
-				u.left = hidePos
+				c1.display = "flex"
+				c2.display = hidePos
+				lo.display = hidePos
+				u.display = hidePos
 				le.style.display = this.#_isExpanded ? "none" : "flex"
 				break
 			case CCDISPLAY.CHART2:
-				c1.left = hidePos
-				c2.left = showPos
-				lo.left = hidePos
-				u.left = hidePos
+				c1.display = hidePos
+				c2.display = showPos
+				lo.display = hidePos
+				u.display = hidePos
 				le.style.display = "none"
 				break
 			case CCDISPLAY.LOADING:
-				c1.left = hidePos
-				c2.left = hidePos
-				lo.left = showPos
-				u.left = hidePos
+				c1.display = hidePos
+				c2.display = hidePos
+				lo.display = showPos
+				u.display = hidePos
 				le.style.display = "none"
 				break
 			case CCDISPLAY.NOTAVAILALBE:
-				c1.left = hidePos
-				c2.left = hidePos
-				lo.left = hidePos
-				u.left = showPos
+				c1.display = hidePos
+				c2.display = hidePos
+				lo.display = hidePos
+				u.display = showPos
 				le.style.display = "none"
 				break
 			default:
@@ -401,93 +378,80 @@ class Element extends HTMLElement {
 	// line chart; please take note of comment on #resize().
 	// TODO: refactor: A ChartCard shouldn't make assumptions about what types of charts it has.
 	setData1(params, cb) {
+		if(!this.#_isVisible) {return}
 		this.#_dataAvailable = params.cols.length > 1
 		this.#displayUnavailable()
-		if(JSON.stringify(params.cols)!=this.#_storedData1)
-		{
-			Chart.init({
-				chartDOMElementId: this.chart1,
-				type: "line",
-				legendDOMElementId: this.shadowRoot.getElementById("legend1"),
-				legendBehaviour: "hover",
-				cols: params.cols,
-				palette: params.palette,
-				fixColors: params.fixColors,
-				seriesLabels: params.countryNamesFull,
-				suffixText: this.#getSuffix(),
-				tooltipFn: this.#_tooltipExtFn1,
-				onFinished: ()=>{
-					this.#resize(true, () => {
-						MultilineFocus.addMultiLineFocus(this.shadowRoot, this.chart1, this.#_lineHoverCallback, MS.SVG_el_prefix)
-						if(cb) {cb()}
-					})
-				},
-				legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
-					e ? MultilineFocus.getLineGroup(this.shadowRoot, MS.SVG_el_prefix+e.substring(0,2)) : e
-				)},
-				decimals: this.#_decimals,
-				padding: -0.4,
-			})
-		} else {
-			if(cb) {cb()}
-		}
-		this.#_storedData1 = JSON.stringify(params.cols)
+		Chart.init({
+			chartDOMElementId: this.chart1,
+			type: "line",
+			legendDOMElementId: this.shadowRoot.getElementById("legend1"),
+			legendBehaviour: "hover",
+			cols: params.cols,
+			palette: params.palette,
+			fixColors: params.fixColors,
+			seriesLabels: params.countryNamesFull,
+			suffixText: this.#getSuffix(),
+			tooltipFn: this.#_tooltipExtFn1,
+			onFinished: () => {
+				MultilineFocus.addMultiLineFocus(this.shadowRoot, this.chart1, this.#_lineHoverCallback, MS.SVG_el_prefix)
+				LegendGroups.dedupe(this.#$("legend1"))
+				if(cb) {cb()}
+			},
+			onResized: () => {
+				LegendGroups.dedupe(this.#$("legend1"))
+				this.#$("legend1").style.paddingLeft=""
+			},
+			legendFocusFn: (e)=>{ Chart.focus(this.chart1, 
+				e ? MultilineFocus.getLineGroup(this.shadowRoot, MS.SVG_el_prefix+e.substring(0,2)) : e
+			)},
+			decimals: this.#_decimals,
+			padding: -0.4,
+		})
 	}
 
 	// vertically connected dot plot (VCDP); please take note of comment on #resize().
 	setData2(params, cb) {
-		if(!this.#_storedData2 || (JSON.stringify(params.cols)!=JSON.stringify(this.#_storedData2.cols)))
-		{
-			Chart.init({
-				chartDOMElementId: this.chart2,
-				type: "line",
-				cols: params.cols,
-				palette: params.palette,
-				fixColors: params.fixColors,
-				seriesLabels: params.countryNamesFull,
-				suffixText: this.#getSuffix(),
-				showLines:false,
-				tooltipFn: this.#_tooltipExtFn2,
-				labelEveryTick: true,
-				onFinished: ()=>{
-					this.#resize(false, () => {
-						if(this.#_isVisible && this.#_isExpanded && this.#_display===CCDISPLAY.CHART2) {
-							drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
-						}
-						XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
-						if(cb) {cb()}
-
-						if(this.#_firstSetDataCall) {
-							this.#_firstSetDataCall = false
-							this.#installResizeObserver()
-						}
-
-					})
-				},
-				xAxisLabelBetween:false,
-				decimals: this.#_decimals,
-				padding: -0.2,
-				firstDifferent: MS.FIRST_DIFFERENT,
-				minMaxY: {min:params.meta.smallestValue, max:params.meta.biggestValue}
-			})
-		} else {
-			drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
-			XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
-			if(cb) {cb()}
-		}
-		this.#_storedData2 = structuredClone(params) //JSON.stringify(params)
+		if(!this.#_isVisible) {return}
+		Chart.init({
+			chartDOMElementId: this.chart2,
+			type: "line",
+			cols: params.cols,
+			palette: params.palette,
+			fixColors: params.fixColors,
+			seriesLabels: params.countryNamesFull,
+			suffixText: this.#getSuffix(),
+			showLines:false,
+			tooltipFn: this.#_tooltipExtFn2,
+			labelEveryTick: true,
+			onFinished: ()=>{
+				if(this.#_isVisible && this.#_isExpanded && this.#_display===CCDISPLAY.CHART2) {
+					drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
+				}
+				XCategoryAxis.hilite(this.shadowRoot, params.highlightIndices)
+				if(cb) {cb()}
+			},
+			onResized: () => {
+				drawVerticalLines(this.shadowRoot, params.highlightIndices, params.cols, MS.ID_NO_DATAPOINT_COUNTRYSERIES)
+			},
+			xAxisLabelBetween:false,
+			decimals: this.#_decimals,
+			padding: -0.2,
+			firstDifferent: MS.FIRST_DIFFERENT,
+			minMaxY: {min:params.meta.smallestValue, max:params.meta.biggestValue}
+		})
+		
 	}
 
-	toggleExpansion(relativeTo) {
+	toggleExpansion() {
 		if(this.#_isExpanded) {
 			this.contract()
 		} else {
-			this.expand(relativeTo)
+			this.expand()
 		}
 		return this.#_isExpanded
 	}
 
-	expand(relativeTo) {
+	expand() {
 		if(this.#_isExpanded) return
 
 		const div = this.shadowRoot.querySelector(".main")
@@ -506,7 +470,7 @@ class Element extends HTMLElement {
 
 		div.style.display="block"
 		div.style.width = "calc(100vw - 70px)"
-		div.style.height = "calc(100dvh - var(--offsety))"
+		div.style.height = "calc(100vh - var(--offsety))"
 
 		div.style.borderRadius=0
 
@@ -514,7 +478,9 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainerBottom").style.display="inline"
 		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="flex"
 		this.shadowRoot.getElementById("close").style.display="block"
-		this.shadowRoot.getElementById("switch").style.display=""
+		this.shadowRoot.getElementById("switchTo1").style.display=""
+		this.shadowRoot.getElementById("switchTo2").style.display=""
+		this.shadowRoot.getElementById("switch").style.display="margin-right:100px;"
 		this.shadowRoot.getElementById("contractedLegend").style.display="none"
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
@@ -540,14 +506,14 @@ class Element extends HTMLElement {
 		Chart.setYLabel(this.chart1, this.#_unitLong)
 		Chart.setYLabel(this.chart2, this.#_unitLong)
 
+		Chart.flush(this.chart1)
+	
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 
-		// TODO: let's see if it works well w/o Promises.all (to be correct event should be fired when both resizes are done)
-		this.#resize(true, () => {
-			const event = new Event("expanding")
-			this.dispatchEvent(event)
-		})
-		this.#resize(false, ()=>{})		//TODO
+		setTimeout(()=>LegendGroups.dedupe(this.#$("legend1")), 200)
+		
+		const event = new Event("expanding")
+		this.dispatchEvent(event)
 	}
 
 	contract() {
@@ -574,7 +540,9 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("slotContainerBottom").style.display="none"
 		this.shadowRoot.getElementById("slotContainerBottomLeft").style.display="none"
 		this.shadowRoot.getElementById("close").style.display="none"
-		this.shadowRoot.getElementById("switch").style.display="none"
+		this.shadowRoot.getElementById("switchTo1").style.display="none"
+		this.shadowRoot.getElementById("switchTo2").style.display="none"
+		this.shadowRoot.getElementById("switch").style.display="margin-right:0px;"
 		this.shadowRoot.getElementById("contractedLegend").style.display="flex"
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
@@ -602,65 +570,8 @@ class Element extends HTMLElement {
 
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 
-		// TODO: let's see if it works well w/o Promises.all
-		this.#resize(true, () => {
-			const event = new Event("contracting")
-			this.dispatchEvent(event)
-		})
-		this.#resize(false)
-	}
-
-
-	// take care: billboard doesn't like to get fed data while resizing.
-	// it might lead to CPU overload and the site not responding to user input anymore.
-	#resize(firstChart, callback) {
-		if(!this || !this.shadowRoot) {return}
-
-		const r = this.shadowRoot.getElementById("chartContainer")		// scream
-
-		if(firstChart && this.chart1) {
-			this.#$("legend1").style.paddingLeft=MS.HIDING_OFFSET		// can't move, because flex item, can't hide because billboardjs doesn't append items when hidden
-
-			if(this.#_resize1Ongoing) {
-				console.warn("chartCard: async resize ongoing for chart1 ",this.#id())
-			} else {
-
-				const width = r.clientWidth + ( this.#_isExpanded ? -100 : Number(MS.shift) )
-				if(width>0) {
-					this.#_resize1Ongoing=true
-					Chart.resize(this.chart1, width, r.clientHeight, ()=>{
-						this.#_resize1Ongoing=false
-						LegendGroups.dedupe(this.#$("legend1"))
-						this.#$("legend1").style.paddingLeft=""
-						if(callback) {callback()}
-						Chart.nullifyCallback(this.chart1)
-					})
-				} else {
-					if(callback) {callback()}
-				}
-
-			}
-		}
-
-		if(!firstChart && this.chart2) {
-			if(this.#_resize2Ongoing) {
-				console.warn("chartCard: async resize ongoing for chart2 ",this.#id())
-			} else {
-
-				const width = r.clientWidth-Number(MS.shift)
-				if(width>0) {
-					this.#_resize2Ongoing=true
-					Chart.resize(this.chart2, width, r.clientHeight, ()=>{
-						this.#_resize2Ongoing=false
-						if(callback) {callback()}
-						Chart.nullifyCallback(this.chart2)
-					})
-				} else {
-					if(callback) {callback()}
-				}
-
-			}
-		}
+		const event = new Event("contracting")
+		this.dispatchEvent(event)
 	}
 
 }

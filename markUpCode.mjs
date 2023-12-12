@@ -108,14 +108,19 @@ export default class MarkUpCode {
 					justify-content:flex-end;
 				}
 			}
-			/* ony visible for dims that make sense to make a screen-hardcopy of - ie where all selectboxes + chart are visible */
+			/* only visible for dims that make sense to make a screen-hardcopy of - ie where all selectboxes + chart are visible */
 			@media (orientation:portrait), (max-width: 1180px) {
 				#downloadLink {display:none;}
 			}
+
+			.switchToButton { width: 50px; height: 50px; margin-top:-20px; }
+			#info { width: 35px; height: 35px; }
 			@media (max-width: 995px) {
 				#close {
 					visibility: hidden;
 				}
+				.switchToButton { width: 35px; height: 35px; margin-top:0px; }
+				#info { width: 35px; height: 35px; margin-right:25px; }
 			}
 
 			@media (max-width: 529px) {
@@ -151,29 +156,32 @@ export default class MarkUpCode {
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerTop" style="display:none; flex-grow:1; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
-				<symbol-button id="close" symbol="close" style="width:30px; display:none; margin:40px 50px;" tabindex="0"></symbol-button>
+				<symbol-button id="close" symbol="close" style="min-width:35px; min-height:35px; display:none; margin:40px 50px;" tabindex="0"></symbol-button>
 			</div>
 
 			<!-- headers' buttons are moved here on narrow width -->
-			<div id="row2" style="display:flex; width:100%;" class="dbg"></div>
+			<div id="row2" style="display:flex; width:100%; justify-content: flex-end;" class="dbg"></div>
 
 			<!-- headers, buttons -->
 			<div id="row3" style="display:flex; width:100%;" class="dbg">
+
+				<!-- only one header is visible at a time, for contracted and for expanded card -->
 				<div style="display:flex; flex-direction:column;">
 					<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
 					<div id="subtitle_c" style="height:5%; margin-left:3px;">...</div>
 				</div>
-					
-				<div style="display:flex; flex-direction:column;">
-					<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
+				<div style="display:flex; flex-direction:column; flex-grow:1;">
+					<div id="row3header" style="height:20px; display:flex; align-items:center;">
+						<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
+						<symbol-button id="info" symbol="info" style="display:none;" tabindex="0"></symbol-button>
+					</div>
 					<div id="subtitle_e" style="display:none; height:5%; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
 
-				<symbol-button id="info" symbol="info" style="display:none; margin-right:5px; flex-grow:1; align-self:center;" tabindex="0"></symbol-button>
 
-				<div id="switch" style="height:20px; text-align:right; display:none; margin-top:5px; margin-right:30px;">
-					<symbol-button id="switchTo1" symbol="lineChart" style="height: 25px; width: 25px; padding-right:20px;" tabindex="0"></symbol-button>
-					<symbol-button id="switchTo2" symbol="dotPlot"  style="height: 25px; width: 25px;" tabindex="0"></symbol-button>
+				<div id="switch" style="display:none; height:20px; display:flex; justify-content: flex-end;">
+					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" style="display:none; padding-right:20px;" tabindex="0"></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"   style="display:none; tabindex="0"></symbol-button>
 				</div>
 			</div>
 
@@ -201,29 +209,27 @@ export default class MarkUpCode {
 				</span>
 			</div>
 
-			<div id="row6" style="display:flex; width:100%;" class="dbg"></div>
+			<!-- row6; height modified by JS -->
+			<div id='chartContainer' style="width:100%;" class="dbg">
 
-			<!-- row7; height modified by JS -->
-			<div id='chartContainer' style="width:100%; position:relative; display:flex;" class="dbg">
-
-					<div id="scream" style="top:0px; display:flex; position:absolute; background:white;">
-						<div id='chart1' style="flex-grow:1;"></div>
-						<div id='legend1' style="display:none; flex-direction: column; justify-content: flex-start; margin: 10px 50px 0 0"></div>
+					<div id="scream" style="display: flex; width:100%; height:100%; background:white;">
+						<div id='chart1' style="width:95%;"></div>
+						<div id='legend1' style="display:none; width: 60px; flex-direction: column; justify-content: flex-start; margin: 10px"></div>
 					</div>
-					<div style="top:0px; position:absolute; background:white;">
-						<div id='chart2'></div>
+					<div style="display: flex; width:100%; height:100%; background:white;">
+						<div id='chart2' style="width:95%;"></div>
 					</div>
-					<div style="top:0px; position:absolute; background:#f0f8ff; width:100%; height:115%; display:flex; align-items:center; justify-content:center; border-radius:6px;">
+					<div style="top:0px; background:#f0f8ff; width:100%; height:115%; display:flex; align-items:center; justify-content:center; border-radius:6px;">
 						<div id='dataUnavailableMsg' class='na'>No data available</div>
 					</div>
-					<div style="top:0px; position:absolute; background:lightblue;">
+					<div style="top:0px; background:lightblue;">
 						<div id='loadingMsg'>Loading</div>
 					</div>
 		
 			</div>
 
 
-			<div id="row8" style="display:flex; width:100%;" class="dbg">
+			<div id="row7" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerBottom" style="height: 20px; width:100%; padding-top:20px; padding-left:30px; padding-right:30px; display: none;">
 					<slot name="slotBottom"></slot>
 				</div>
@@ -232,10 +238,10 @@ export default class MarkUpCode {
 
 
 			<!-- footer tryptychon (detail legend, source link, some buttons) -->
-			<!-- attentions: "display:flex" in JS -->
+			<!-- attention: "display:flex" in JS -->
 			<div id="bottomLine" style="display:none; flex-wrap:wrap; max-width:100%;">
 
-				<!-- attentions: "display:flex" in JS -->
+				<!-- attention: "display:flex" in JS -->
 				<div id="slotContainerBottomLeft" class="footer-forceBreak" style="display:flex;">
 					<slot name="slotBottomLeft"></slot>
 				</div>
