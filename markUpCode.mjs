@@ -168,14 +168,14 @@ export default class MarkUpCode {
 				<!-- only one header is visible at a time, for contracted and for expanded card -->
 				<div style="display:flex; flex-direction:column;">
 					<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
-					<div id="subtitle_c" style="height:5%; margin-left:3px;">...</div>
+					<div id="subtitle_c" style="margin-left:3px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">...</div>
 				</div>
 				<div style="display:flex; flex-direction:column; flex-grow:1;">
-					<div id="row3header" style="height:20px; display:flex; align-items:center;">
+					<div id="row3header" style="display:flex; align-items:center;">
 						<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
 						<symbol-button id="info" symbol="info" style="display:none;" tabindex="0"></symbol-button>
 					</div>
-					<div id="subtitle_e" style="display:none; height:5%; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
+					<div id="subtitle_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
 
 
@@ -213,7 +213,7 @@ export default class MarkUpCode {
 			<div id='chartContainer' style="width:100%;" class="dbg">
 
 					<div id="scream" style="display: flex; width:100%; height:100%; background:white;">
-						<div id='chart1' style="width:95%;"></div>
+						<div id='chart1' style="width:100%;"></div>
 						<div id='legend1' style="display:none; width: 60px; flex-direction: column; justify-content: flex-start; margin: 10px"></div>
 					</div>
 					<div style="display: flex; width:100%; height:100%; background:white;">
