@@ -490,6 +490,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="-20px"
+			this.shadowRoot.querySelector("#chart2 > svg").style.marginLeft="-20px"
 		} else {
 			console.error("chartCard: no line chart "+this.#id())
 		}

@@ -163,7 +163,7 @@ export default class MarkUpCode {
 			<div id="row2" style="display:flex; width:100%; justify-content: flex-end;" class="dbg"></div>
 
 			<!-- headers, buttons -->
-			<div id="row3" style="display:flex; width:100%;" class="dbg">
+			<div id="row3" style="display:flex; width:100%; margin: 5px 0 5px 0;" class="dbg">
 
 				<!-- only one header is visible at a time, for contracted and for expanded card -->
 				<div style="display:flex; flex-direction:column;">
@@ -217,7 +217,7 @@ export default class MarkUpCode {
 						<div id='legend1' style="display:none; width: 60px; flex-direction: column; justify-content: flex-start; margin: 10px"></div>
 					</div>
 					<div style="display: flex; width:100%; height:100%; background:white;">
-						<div id='chart2' style="width:95%;"></div>
+						<div id='chart2' style="width:100%;"></div>
 					</div>
 					<div style="top:0px; background:#f0f8ff; width:100%; height:115%; display:flex; align-items:center; justify-content:center; border-radius:6px;">
 						<div id='dataUnavailableMsg' class='na'>No data available</div>
