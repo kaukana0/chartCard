@@ -92,7 +92,6 @@ class Element extends HTMLElement {
 		this.setAttribute("anchor",val)
 	}
 
-	// billboard can't draw when display:none and moving out of view doesn't always not work (e.g. if this card is used as a flex-item)
 	set isVisible(val) {
 		this.#_isVisible = val
 		if(val) {
@@ -210,7 +209,7 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
-		// note: doing it here triggers resize immediately
+		// note: triggers resize immediately
 		this.#installResizeObserver()
 
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
@@ -375,7 +374,6 @@ class Element extends HTMLElement {
 		}
 	}
 	
-	// line chart; please take note of comment on #resize().
 	// TODO: refactor: A ChartCard shouldn't make assumptions about what types of charts it has.
 	setData1(params, cb) {
 		this.#_dataAvailable = params.cols.length > 1
@@ -408,7 +406,7 @@ class Element extends HTMLElement {
 		})
 	}
 
-	// vertically connected dot plot (VCDP); please take note of comment on #resize().
+	// vertically connected dot plot (VCDP)
 	setData2(params, cb) {
 		Chart.init({
 			chartDOMElementId: this.chart2,
