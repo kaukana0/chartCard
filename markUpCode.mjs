@@ -129,7 +129,7 @@ export default class MarkUpCode {
 					height:300px;
 				}
 				.shrinkOnContracted {
-					max-height:54%;
+					max-height:53%;
 				}
 				h2 {
 					font-size:1.2em;
@@ -137,7 +137,7 @@ export default class MarkUpCode {
 			}
 
 			.shrinkOnContracted {
-				height:62%;
+				height:61%;
 			}
 
 			.growOnExpanded {
