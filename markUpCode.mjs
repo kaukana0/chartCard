@@ -128,16 +128,20 @@ export default class MarkUpCode {
 					width:300px;
 					height:300px;
 				}
-				#chartContainer {
-					max-height:50%;
+				.shrinkOnContracted {
+					max-height:54%;
 				}
 				h2 {
 					font-size:1.2em;
 				}
 			}
 
-			#chartContainer {
+			.shrinkOnContracted {
 				height:62%;
+			}
+
+			.growOnExpanded {
+				height:45vh;
 			}
 
 			.hideCard {
@@ -210,7 +214,7 @@ export default class MarkUpCode {
 			</div>
 
 			<!-- row6; height modified by JS -->
-			<div id='chartContainer' style="width:100%;" class="dbg">
+			<div id='chartContainer' style="width:100%;" class="shrinkOnContracted dbg">
 
 					<div id="scream" style="display: flex; width:100%; height:100%; background:white;">
 						<div id='chart1' style="width:100%;"></div>

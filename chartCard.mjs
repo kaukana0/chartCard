@@ -18,16 +18,12 @@ import drawVerticalLines from "./functionalities/verticalLines.mjs"
 
 // magic strings
 const MS = {
-	dimNarrow: {width: "300px", height: "300px"},
 	dimFull: {width: "380px", height: "380px"},
-	heightNarrow: {exp:"55%", con:"50%"},
-	heightFull: {exp:"55%", con:"62%"},
 
 	shift: 25,					// in overview, no y label is shown but space is claimed by billboardjs anyway
 	SVG_el_prefix: "bb-target-",
 	ID_NO_DATAPOINT_COUNTRYSERIES: "",      // datapoint missing  TODO: NO! a component mustn't depend on an app! introduce a setter!
 	FIRST_DIFFERENT: "EU, ",
-	HIDING_OFFSET: "50000px",
 }
 
 // chart container display
@@ -115,6 +111,14 @@ class Element extends HTMLElement {
 	get chart1Displayed() {return this.#_display===CCDISPLAY.CHART1}
 
 	connectedCallback() {
+		this.installEventHandlers()
+		this.shadowRoot.getElementById("chartContainer").classList.add("shrinkOnContracted")
+		// note: triggers resize immediately
+		this.#installResizeObserver()
+		this.setChartContainerDisplay(CCDISPLAY.CHART1)
+	}
+
+	installEventHandlers() {
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
 				this.contract() 
@@ -208,11 +212,6 @@ class Element extends HTMLElement {
 			document.getElementById("globalModal").show()
 			ev.stopPropagation()
 		})
-
-		// note: triggers resize immediately
-		this.#installResizeObserver()
-
-		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 	}
 
 	#installResizeObserver() {
@@ -244,11 +243,6 @@ class Element extends HTMLElement {
 	#isNarrowScreen() {
 		return document.documentElement.clientWidth<995
 	}
-
-	#isVeryNarrowScreen() {
-		return document.documentElement.clientWidth<529
-	}
-
 
 	setChartContainerDisplay(display) {
 		this.#_display = display
@@ -466,7 +460,7 @@ class Element extends HTMLElement {
 
 		div.style.display="block"
 		div.style.width = "calc(100vw - 70px)"
-		div.style.height = "100%" //"calc(100vh - var(--offsety))"
+		div.style.height = "100%"
 
 		div.style.borderRadius=0
 
@@ -481,8 +475,8 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="none"
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="flex"
-		this.shadowRoot.getElementById("chartContainer").style.height = this.#isVeryNarrowScreen()?MS.heightNarrow.exp:MS.heightFull.exp   //"55%"
-		//this.shadowRoot.getElementById("main").style.overflowY="auto"	
+		this.shadowRoot.getElementById("chartContainer").classList.remove("shrinkOnContracted")
+		this.shadowRoot.getElementById("chartContainer").classList.add("growOnExpanded")
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="-20px"
@@ -544,7 +538,8 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right1").style.display="block"
 		this.shadowRoot.getElementById("right2").style.display="block"
 		this.shadowRoot.getElementById("bottomLine").style.display="none"
-		this.shadowRoot.getElementById("chartContainer").style.height =	this.#isVeryNarrowScreen()?MS.heightNarrow.con:MS.heightFull.con	// "62%"		// when modifying this, also modify html in MarkUpCode
+		this.shadowRoot.getElementById("chartContainer").classList.add("shrinkOnContracted")
+		this.shadowRoot.getElementById("chartContainer").classList.remove("growOnExpanded")
 		this.shadowRoot.getElementById("main").style.overflowY="hidden"
 		this.shadowRoot.getElementById("legend1").style.display="none"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
