@@ -156,7 +156,7 @@ export default class MarkUpCode {
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerTop" style="display:none; flex-grow:1; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
-				<symbol-button id="close" symbol="close" style="min-width:35px; min-height:35px; display:none; margin:40px 50px;" tabindex="0"></symbol-button>
+				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" tabindex="0"></symbol-button>
 			</div>
 
 			<!-- headers' buttons are moved here on narrow width -->
