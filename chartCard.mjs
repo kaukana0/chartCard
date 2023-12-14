@@ -466,7 +466,7 @@ class Element extends HTMLElement {
 
 		div.style.display="block"
 		div.style.width = "calc(100vw - 70px)"
-		div.style.height = "calc(100vh - var(--offsety))"
+		div.style.height = "100%" //"calc(100vh - var(--offsety))"
 
 		div.style.borderRadius=0
 
@@ -482,7 +482,7 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("right2").style.display="none"
 		this.shadowRoot.getElementById("bottomLine").style.display="flex"
 		this.shadowRoot.getElementById("chartContainer").style.height = this.#isVeryNarrowScreen()?MS.heightNarrow.exp:MS.heightFull.exp   //"55%"
-		this.shadowRoot.getElementById("main").style.overflowY="auto"	
+		//this.shadowRoot.getElementById("main").style.overflowY="auto"	
 		this.shadowRoot.getElementById("legend1").style.display="flex"
 		if(this.shadowRoot.querySelector("#chart1 > svg")) {
 			this.shadowRoot.querySelector("#chart1 > svg").style.marginLeft="-20px"
