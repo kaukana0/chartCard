@@ -268,7 +268,7 @@ class Element extends HTMLElement {
 				break
 			case CCDISPLAY.CHART2:
 				c1.display = hidePos
-				c2.display = showPos
+				c2.display = "flex"
 				lo.display = hidePos
 				u.display = hidePos
 				le.style.display = "none"
@@ -425,7 +425,7 @@ class Element extends HTMLElement {
 			},
 			xAxisLabelBetween:false,
 			decimals: this.#_decimals,
-			padding: -0.2,
+			padding: 0.0,
 			firstDifferent: MS.FIRST_DIFFERENT,
 			minMaxY: {min:params.meta.smallestValue, max:params.meta.biggestValue}
 		})
