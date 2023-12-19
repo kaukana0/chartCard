@@ -220,7 +220,7 @@ export default class MarkUpCode {
 						<div id='chart1' style="width:100%;"></div>
 						<div id='legend1' style="display:none; width: 60px; flex-direction: column; justify-content: flex-start; margin: 10px 0 0 0;"></div>
 					</div>
-					<div style="display: none; width:100%; height:100%; background:white;">
+					<div style="display: none; width:100%; height:100%; background:white;" id="chart2container">
 						<div id='chart2' style="width:100%;"></div>
 					</div>
 					<div style="top:0px; background:#f0f8ff; width:100%; height:115%; display:flex; align-items:center; justify-content:center; border-radius:6px;">

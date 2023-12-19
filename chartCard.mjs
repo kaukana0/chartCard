@@ -221,8 +221,17 @@ class Element extends HTMLElement {
 
 	#onResizeObserver() {
 		Chart.flush(this.chart1)
-		Chart.flush(this.chart2)
 		this.#moveHeaderButtons(this.#isNarrowScreen())
+
+		if( this.#isNarrowScreen() ) {
+			this.shadowRoot.getElementById("chart2container").style.overflowX="scroll"
+			Chart.setWidth(this.chart2, 995)
+		} else {
+			this.shadowRoot.getElementById("chart2container").style.overflowX="hidden"
+			Chart.setWidth(this.chart2)
+		}
+
+		Chart.flush(this.chart2)
 	}
 
 	#moveHeaderButtons(toRow2) {
@@ -402,6 +411,16 @@ class Element extends HTMLElement {
 
 	// vertically connected dot plot (VCDP)
 	setData2(params, cb) {
+		if(this.#isNarrowScreen()) {
+			Chart.setWidth(this.chart2, 995)
+			// dots get lost if there's no delay here ... (?)
+			setTimeout(()=>this.#_setData2(params, cb), 350)
+		} else {
+			this.#_setData2(params, cb)
+		}
+	}
+
+	#_setData2(params, cb) {
 		Chart.init({
 			chartDOMElementId: this.chart2,
 			type: "line",
@@ -429,7 +448,6 @@ class Element extends HTMLElement {
 			firstDifferent: MS.FIRST_DIFFERENT,
 			minMaxY: {min:params.meta.smallestValue, max:params.meta.biggestValue}
 		})
-		
 	}
 
 	toggleExpansion() {
