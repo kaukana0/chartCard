@@ -86,8 +86,9 @@ function removeSuperfluousHorizontalLines(DOMRoot) {
 // assume number of dots for each of the 3 series are equal
 function getDots(root) {
   let retVal
-  const byCitizenship = ["Citizens-of-a-non-EU-country",  "Citizens-of-another-EU-country", "Nationals"]
-  const byBirth = ["Born-in-a-non-EU-country", "Born-in-another-EU-country", "Native-born"]
+  // TODO: magic strings :-(
+  const byCitizenship = ["Citizens-of-a-non-EU-country",  "Citizens-of-another-EU-country", "Nationals-of-the-reporting-country"]
+  const byBirth = ["Born-in-a-non-EU-country", "Born-in-another-EU-country", "Native-born-in-the-reporting-country"]
   function sel(bla) {return `#chart2 > svg > g > g.bb-chart > g.bb-chart-lines > g.bb-chart-line.bb-target.bb-target-${bla} > g.bb-circles > use`}
 
   const neu = root.querySelectorAll(sel(byCitizenship[0]))
