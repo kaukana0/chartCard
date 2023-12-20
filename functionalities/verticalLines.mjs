@@ -138,7 +138,10 @@ function hideDots(dots, cols, noDatapointId) {
   for(let i=0; i<len; i++) {       // datapoints in a series
     for(let j=1; j<cols.length; j++) {    // series
       if(cols[j][i+1]===noDatapointId) {
-        bla.get(cols[j][0])[i].setAttribute("opacity","0")
+        const x = bla.get(cols[j][0])[i]
+        if(x) {
+          x.setAttribute("opacity","0")
+        }
       }
     }
   }
