@@ -30,6 +30,11 @@ const MS = {
 const CCDISPLAY = Object.freeze({	CHART1:0, CHART2:1, LOADING:2, NOTAVAILALBE:3 })
 
 
+export function isNarrowScreen() {
+	return document.documentElement.clientWidth<995
+}
+
+
 // note: The card isn't aware about the slot content - it makes no assumptions (and shouldn't ever) about what it is.
 class Element extends HTMLElement {
 
@@ -221,9 +226,9 @@ class Element extends HTMLElement {
 
 	#onResizeObserver() {
 		Chart.flush(this.chart1)
-		this.#moveHeaderButtons(this.#isNarrowScreen())
+		this.#moveHeaderButtons(isNarrowScreen())
 
-		if( this.#isNarrowScreen() ) {
+		if( isNarrowScreen() ) {
 			this.shadowRoot.getElementById("chart2container").style.overflowX="scroll"
 			Chart.setWidth(this.chart2, 995)
 		} else {
@@ -247,10 +252,6 @@ class Element extends HTMLElement {
 			this.shadowRoot.getElementById("switch").append(b)
 			this.shadowRoot.getElementById("switch").append(c)
 		}
-	}
-
-	#isNarrowScreen() {
-		return document.documentElement.clientWidth<995
 	}
 
 	setChartContainerDisplay(display) {
@@ -411,7 +412,7 @@ class Element extends HTMLElement {
 
 	// vertically connected dot plot (VCDP)
 	setData2(params, cb) {
-		if(this.#isNarrowScreen()) {
+		if(isNarrowScreen()) {
 			Chart.setWidth(this.chart2, 995)
 			// dots get lost if there's no delay here ... (?)
 			setTimeout(()=>this.#_setData2(params, cb), 350)
