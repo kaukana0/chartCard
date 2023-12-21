@@ -134,6 +134,9 @@ export default class MarkUpCode {
 				h2 {
 					font-size:1.2em;
 				}
+				#contractedLegend {
+					padding-left:10px !important;
+				}
 			}
 
 			.shrinkOnContracted {
