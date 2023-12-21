@@ -160,7 +160,7 @@ export default class MarkUpCode {
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerTop" style="display:none; flex-grow:1; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
-				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" tabindex="0"></symbol-button>
+				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" tabindex="0" data-html2canvas-ignore></symbol-button>
 			</div>
 
 			<!-- headers' buttons are moved here on narrow width -->
@@ -177,13 +177,13 @@ export default class MarkUpCode {
 				<div style="display:flex; flex-direction:column; flex-grow:1;">
 					<div id="row3header" style="display:flex; align-items:center;">
 						<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
-						<symbol-button id="info" symbol="info" style="display:none;" tabindex="0"></symbol-button>
+						<symbol-button id="info" symbol="info" style="display:none;" tabindex="0" data-html2canvas-ignore></symbol-button>
 					</div>
 					<div id="subtitle_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
 
 
-				<div id="switch" style="display:none; height:20px; display:flex; justify-content: flex-end;">
+				<div id="switch" style="display:none; height:20px; display:flex; justify-content: flex-end;" data-html2canvas-ignore>
 					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" style="display:none; padding-right:20px;" tabindex="0"></symbol-button>
 					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"   style="display:none; tabindex="0"></symbol-button>
 				</div>
@@ -261,14 +261,14 @@ export default class MarkUpCode {
 
 				<div style="display:flex; margin: 10px;" class="footer-end footer-forceBreak">
 
-					<button id="downloadLink" class="ecl-button ecl-button--primary" type="button" style="width:140px; height: 45px; justify-self: right; margin: 5px">
+					<button id="downloadLink" class="ecl-button ecl-button--primary" type="button" style="width:140px; height: 45px; justify-self: right; margin: 5px" data-html2canvas-ignore>
 						<svg class="ecl-icon ecl-icon--xs ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="">
 							<use xlink:href="./redist/ecl/icons.svg#download"></use>
 						</svg>
 						<span class="ecl-button__label" data-ecl-label="true">Download</span>
 					</button>
 
-					<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:155px; height: 45px; justify-self: right; margin: 5px 30px; padding:0; display:flex; align-items:center;">
+					<button id="articleLink" class="ecl-button ecl-button--call" type="button" style="width:155px; height: 45px; justify-self: right; margin: 5px 30px; padding:0; display:flex; align-items:center;" data-html2canvas-ignore>
 						<span style="flex-grow:1; padding:0;" class="" data-ecl-label="true">Read the article</span>
 						<svg class="ecl-icon ecl-icon--xs ecl-icon--rotate-90 ecl-button__icon ecl-button__icon--after" focusable="false" aria-hidden="true" data-ecl-icon="" style="margin: 0px 5px 0 0; padding:0;">
 							<use xlink:href="./redist/ecl/icons.svg#corner-arrow"></use>

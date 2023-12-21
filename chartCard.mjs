@@ -116,14 +116,15 @@ class Element extends HTMLElement {
 	get chart1Displayed() {return this.#_display===CCDISPLAY.CHART1}
 
 	connectedCallback() {
-		this.installEventHandlers()
+		this.#installEventHandlers()
 		this.shadowRoot.getElementById("chartContainer").classList.add("shrinkOnContracted")
 		// note: triggers resize immediately
 		this.#installResizeObserver()
 		this.setChartContainerDisplay(CCDISPLAY.CHART1)
 	}
 
-	installEventHandlers() {
+	#installEventHandlers() {
+	
 		this.#$("close").addEventListener("click", (ev) => {
 			if(this.#_isExpanded) {
 				this.contract() 
@@ -180,32 +181,7 @@ class Element extends HTMLElement {
 		})
 
 		this.#$("downloadLink").addEventListener("click", (ev) => {
-
-			PopUpMessage.show("Your image download is being prepared now.\nThis may take a while during which the page is unresponsive.\nPlease hold on.",false,1000);
-
-			setTimeout(()=>{
-
-				const opt = {
-					//windowWidth:"1500",
-					//windowHeight:"1024",
-					//width:"1500",
-					//height:"1024",
-					//scrollX:"0",
-					//scrollY:"1",
-					logging:false
-				}
-
-				html2canvas(this.shadowRoot.getElementById("main"), opt).then(function(canvas) {
-					const createEl = document.createElement('a');
-					createEl.href = canvas.toDataURL();
-					createEl.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png";
-					createEl.click();
-					createEl.remove();
-					PopUpMessage.show("Your image is now downloaded.",true,null);
-				});
-
-			},100)
-
+			this.#createScreenshot()
 			ev.stopPropagation()
 		})
 
@@ -217,6 +193,41 @@ class Element extends HTMLElement {
 			document.getElementById("globalModal").show()
 			ev.stopPropagation()
 		})
+	}
+
+	// TODO: get this out of here
+	#createScreenshot() {
+
+		const cfg = {
+			//windowWidth:"2048",	windowHeight:"1024",
+			//width:"2048",	height:"1024",
+			logging:false,
+			onclone: function(doc) { doc.querySelectorAll("use.bb-circle").forEach(replace)	}
+		}
+
+		html2canvas(document.body, cfg).then(function(canvas) {
+			const tmp = document.createElement('a')
+			tmp.href = canvas.toDataURL()
+			tmp.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png"
+			tmp.click()
+			tmp.remove()
+			PopUpMessage.show("Your image is now downloaded.",true,null)
+		})
+
+			// replace <use> with <circle> because for some reason, uses' color isn't considered and all dots in plot are black
+		function replace(origElement) {
+			const newElement = document.createElementNS("http://www.w3.org/2000/svg","circle")
+			const x = Number(origElement.getAttribute("x"))
+			if(x>3) {	// avoid unwanted dots top left
+				newElement.setAttribute("r","6")
+				newElement.setAttribute("cx", 6+x)
+				newElement.setAttribute("cy", 6+Number(origElement.getAttribute("y")))
+				newElement.setAttribute("fill","currentColor")
+				newElement.style.color=origElement.style.fill
+				origElement.parentNode.appendChild(newElement)
+				origElement.remove()
+			}
+		}
 	}
 
 	#installResizeObserver() {
@@ -412,12 +423,12 @@ class Element extends HTMLElement {
 
 	// vertically connected dot plot (VCDP)
 	setData2(params, cb) {
+		// dots get lost if there's no delay here ... (why billboardjs ?)
 		if(isNarrowScreen()) {
 			Chart.setWidth(this.chart2, 995)
-			// dots get lost if there's no delay here ... (?)
 			setTimeout(()=>this.#_setData2(params, cb), 350)
 		} else {
-			this.#_setData2(params, cb)
+			setTimeout(()=>this.#_setData2(params, cb), 250)
 		}
 	}
 
