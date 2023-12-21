@@ -198,6 +198,8 @@ class Element extends HTMLElement {
 	// TODO: get this out of here
 	#createScreenshot() {
 
+		document.querySelectorAll(".globan").forEach((e)=>e.setAttribute("data-html2canvas-ignore", ""))
+
 		const cfg = {
 			//windowWidth:"2048",	windowHeight:"1024",
 			//width:"2048",	height:"1024",
@@ -214,14 +216,17 @@ class Element extends HTMLElement {
 			PopUpMessage.show("Your image is now downloaded.",true,null)
 		})
 
+		const h = Number(this.shadowRoot.querySelector(".bb-event-rect").getAttribute("height"))
+
 			// replace <use> with <circle> because for some reason, uses' color isn't considered and all dots in plot are black
 		function replace(origElement) {
 			const newElement = document.createElementNS("http://www.w3.org/2000/svg","circle")
 			const x = Number(origElement.getAttribute("x"))
-			if(x>3) {	// avoid unwanted dots top left
+			const y = Number(origElement.getAttribute("y"))
+			if(x>3 && y<h) {	// avoid unwanted dots
 				newElement.setAttribute("r","6")
 				newElement.setAttribute("cx", 6+x)
-				newElement.setAttribute("cy", 6+Number(origElement.getAttribute("y")))
+				newElement.setAttribute("cy", 6+y)
 				newElement.setAttribute("fill","currentColor")
 				newElement.style.color=origElement.style.fill
 				origElement.parentNode.appendChild(newElement)
