@@ -191,8 +191,8 @@ export default class MarkUpCode {
 
 
 				<div id="switch" style="display:none; height:20px; display:flex; justify-content: flex-end;" data-html2canvas-ignore>
-					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" style="display:none; padding-right:20px;" alt="Switch to Line Chart"></symbol-button>
-					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"   style="display:none;" alt="Switch to Dot Plot"></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" style="display:none; padding-right:20px;" alt="Switch to Line Chart" aria-label="Switch to Line Chart"></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"   style="display:none;" alt="Switch to Dot Plot" aria-label="Switch to Dot Plot"></symbol-button>
 				</div>
 			</div>
 
