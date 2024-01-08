@@ -163,7 +163,7 @@ export default class MarkUpCode {
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerTop" style="display:none; flex-grow:1; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
-				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" data-html2canvas-ignore></symbol-button>
+				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" data-html2canvas-ignore alt="Close"></symbol-button>
 			</div>
 
 			<!-- headers' buttons are moved here on narrow width -->
@@ -187,8 +187,8 @@ export default class MarkUpCode {
 
 
 				<div id="switch" style="display:none; height:20px; display:flex; justify-content: flex-end;" data-html2canvas-ignore>
-					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" style="display:none; padding-right:20px;"></symbol-button>
-					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"   style="display:none;"></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" style="display:none; padding-right:20px;" alt="Switch to Line Chart"></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"   style="display:none;" alt="Switch to Dot Plot"></symbol-button>
 				</div>
 			</div>
 
