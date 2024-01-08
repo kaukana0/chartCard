@@ -498,6 +498,7 @@ class Element extends HTMLElement {
 		div.style.height = "100%"
 
 		div.style.borderRadius=0
+		div.classList.remove("mousePointer")
 
 		this.shadowRoot.getElementById("slotContainerTop").style.display="block"
 		this.shadowRoot.getElementById("slotContainerBottom").style.display="inline"
@@ -563,6 +564,7 @@ class Element extends HTMLElement {
 		div.style.zIndex=""
 		div.style.borderRadius=this.storedStyles.div.borderRadius
 		div.scrollTop=0
+		div.classList.add("mousePointer")
 
 		this.shadowRoot.getElementById("slotContainerTop").style.display="none"
 		this.shadowRoot.getElementById("slotContainerBottom").style.display="none"

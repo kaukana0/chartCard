@@ -28,6 +28,10 @@ export default class MarkUpCode {
 				--offsety: 0px;
 			}
 
+			.mousePointer {
+				cursor: pointer;
+			}
+
 			.noMargin {
 				margin:0;
 				padding:0 35px 0 35px;
@@ -158,7 +162,7 @@ export default class MarkUpCode {
 
 
 
-		<div tabindex="0" id="main" class="main blueBorder">
+		<div tabindex="0" id="main" class="main blueBorder mousePointer">
 
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
