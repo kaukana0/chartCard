@@ -180,7 +180,7 @@ export default class MarkUpCode {
 				<div style="display:flex; flex-direction:column; flex-grow:1;">
 					<div id="row3header" style="display:flex; align-items:center;">
 						<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
-						<symbol-button id="info" symbol="info" style="display:none;" data-html2canvas-ignore></symbol-button>
+						<symbol-button id="info" symbol="info" style="display:none;" data-html2canvas-ignore alt="Information"></symbol-button>
 					</div>
 					<div id="subtitle_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
