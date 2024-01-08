@@ -125,7 +125,7 @@ class Element extends HTMLElement {
 
 	#installEventHandlers() {
 	
-		this.#$("close").addEventListener("click", (ev) => {
+		this.#$("close").addEventListener("action", (ev) => {
 			if(this.#_isExpanded) {
 				this.contract() 
 			}
@@ -151,7 +151,7 @@ class Element extends HTMLElement {
 			}
 		})
 
-		this.#$("switchTo2").addEventListener("click", (ev) => {
+		this.#$("switchTo2").addEventListener("action", (ev) => {
 			if(!this.chart1Displayed) {return}
 
 			this.setChartContainerDisplay(CCDISPLAY.CHART2)
@@ -163,7 +163,7 @@ class Element extends HTMLElement {
 			this.dispatchEvent(event)
 		})
 
-		this.#$("switchTo1").addEventListener("click", (ev) => {
+		this.#$("switchTo1").addEventListener("action", (ev) => {
 			if(this.chart1Displayed) {return}
 
 			this.setChartContainerDisplay(CCDISPLAY.CHART1)
@@ -185,7 +185,7 @@ class Element extends HTMLElement {
 			ev.stopPropagation()
 		})
 
-		this.#$("info").addEventListener("click", (ev) => {
+		this.#$("info").addEventListener("action", (ev) => {
 			// TODO: this is a workaround. 
 			// don't use a global modal (at least not in this way)
 			document.getElementById("globalModal").setHeader("Information")
@@ -540,6 +540,8 @@ class Element extends HTMLElement {
 		
 		const event = new Event("expanding")
 		this.dispatchEvent(event)
+
+		this.shadowRoot.getElementById("close").focus()
 	}
 
 	contract() {
