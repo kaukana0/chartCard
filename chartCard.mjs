@@ -9,7 +9,7 @@ import * as XCategoryAxis from "./functionalities/xCategoryAxis.mjs"
 import * as PopUpMessage from "../../js/view/modules/popUpMessage.mjs"		// TODO: get this out of here
 
 import "../eclLikeModal/modal.mjs"
-import "../buttonX/button.mjs"
+import "../symbolButton/button.mjs"
 
 import "../../redist/html2canvas-1.4.1.js"		// TODO: esm?
 
@@ -155,8 +155,10 @@ class Element extends HTMLElement {
 			if(!this.chart1Displayed) {return}
 
 			this.setChartContainerDisplay(CCDISPLAY.CHART2)
-			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="none"
+
+			this.shadowRoot.getElementById("switchTo1").setActivated = false
+			this.shadowRoot.getElementById("switchTo2").setActivated = true
 
 			const event = new Event("chartSwitched")
 			event["to"] = 2
@@ -167,8 +169,10 @@ class Element extends HTMLElement {
 			if(this.chart1Displayed) {return}
 
 			this.setChartContainerDisplay(CCDISPLAY.CHART1)
-			ev.stopPropagation()
 			this.shadowRoot.getElementById("legend1").style.display="flex"
+
+			this.shadowRoot.getElementById("switchTo1").setActivated = true
+			this.shadowRoot.getElementById("switchTo2").setActivated = false
 
 			const event = new Event("chartSwitched")
 			event["to"] = 1
@@ -191,7 +195,6 @@ class Element extends HTMLElement {
 			document.getElementById("globalModal").setHeader("Information")
 			document.getElementById("globalModal").setText(this.#_infoText)
 			document.getElementById("globalModal").show()
-			ev.stopPropagation()
 		})
 	}
 
@@ -213,7 +216,7 @@ class Element extends HTMLElement {
 			tmp.download = "Migrant-integration-and-inclusion-dashboard-screenshot.png"
 			tmp.click()
 			tmp.remove()
-			PopUpMessage.show("Your image is now downloaded.",true,null)
+			PopUpMessage.show("Your image is now downloaded.")
 		})
 
 		const h = Number(this.shadowRoot.querySelector(".bb-event-rect").getAttribute("height"))
