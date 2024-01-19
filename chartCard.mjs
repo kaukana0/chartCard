@@ -509,6 +509,8 @@ class Element extends HTMLElement {
 		this.shadowRoot.getElementById("close").style.display="block"
 		this.shadowRoot.getElementById("switchTo1").style.display=""
 		this.shadowRoot.getElementById("switchTo2").style.display=""
+		this.shadowRoot.getElementById("switchTo1").setActivated = true
+		this.shadowRoot.getElementById("switchTo2").setActivated = false
 		this.shadowRoot.getElementById("switch").style.display="margin-right:100px;"
 		this.shadowRoot.getElementById("contractedLegend").style.display="none"
 		this.shadowRoot.getElementById("right1").style.display="none"
