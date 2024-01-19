@@ -389,7 +389,7 @@ class Element extends HTMLElement {
 	}
 
 	// "%" should be directly after the number, "PPS" for instance separated by a space
-	#getSuffix() {
+	#getTooltipSuffix() {
 		if(this.#_unitShort.length===1) {
 			return this.#_unitShort
 		} else {
@@ -410,7 +410,7 @@ class Element extends HTMLElement {
 			palette: params.palette,
 			fixColors: params.fixColors,
 			seriesLabels: params.countryNamesFull,
-			suffixText: this.#getSuffix(),
+			suffixText: this.#getTooltipSuffix(),
 			tooltipFn: this.#_tooltipExtFn1,
 			onFinished: () => {
 				MultilineFocus.addMultiLineFocus(this.shadowRoot, this.chart1, this.#_lineHoverCallback, MS.SVG_el_prefix)
@@ -448,7 +448,7 @@ class Element extends HTMLElement {
 			palette: params.palette,
 			fixColors: params.fixColors,
 			seriesLabels: params.countryNamesFull,
-			suffixText: this.#getSuffix(),
+			suffixText: this.#getTooltipSuffix(),
 			showLines:false,
 			tooltipFn: this.#_tooltipExtFn2,
 			labelEveryTick: true,
