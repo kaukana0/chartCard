@@ -329,7 +329,7 @@ export default class MarkUpCode {
 			font-family: Arial,sans-serif;
 			font-size: 15px;
 		}
-		.coloredDot {
+		.legendItemColor {
 			display: inline-block;
 			height: 26px;
 			width: 26px;

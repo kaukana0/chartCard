@@ -426,6 +426,13 @@ class Element extends HTMLElement {
 			)},
 			decimals: this.#_decimals,
 			padding: -0.4,
+			cacCallback: function(title, IF) {
+				return [
+					title.substring(0,2),
+					IF ? IF.getColor(title) : null
+				]
+			}
+
 		})
 	}
 
