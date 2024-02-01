@@ -144,7 +144,7 @@ export default class MarkUpCode {
 			}
 
 			.shrinkOnContracted {
-				height:61%;
+				height:59%;
 			}
 
 			.growOnExpanded {
