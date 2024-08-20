@@ -167,7 +167,7 @@ export default class MarkUpCode {
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerTop" style="display:none; flex-grow:1; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
-				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" data-html2canvas-ignore alt="Close"></symbol-button>
+				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" data-html2canvas-ignore aria-label="Button closing currently expanded card" alt="Close"></symbol-button>
 			</div>
 
 			<!-- headers' buttons are moved here on narrow width -->
@@ -177,14 +177,14 @@ export default class MarkUpCode {
 			<div id="row3" style="display:flex; width:100%; margin: 5px 0 5px 0;" class="dbg">
 
 				<!-- only one header is visible at a time, for contracted and for expanded card -->
-				<div style="display:flex; flex-direction:column;">
+				<div style="display:flex; flex-direction:column;" aria-hidden="true">
 					<h2 id="header_c" style="height:auto; margin:3px;">${title}</h2>
 					<div id="subtitle_c" style="margin-left:3px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">...</div>
 				</div>
 				<div style="display:flex; flex-direction:column; flex-grow:1;">
 					<div id="row3header" style="display:flex; align-items:center;">
 						<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
-						<symbol-button id="info" symbol="info" style="display:none;" data-html2canvas-ignore alt="Information"></symbol-button>
+						<symbol-button id="info" symbol="info" style="display:none;" data-html2canvas-ignore alt="Information" aria-label="Button opening Dialog with Information about the Idicator." aria-haspopup="dialog"></symbol-button>
 					</div>
 					<div id="subtitle_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
@@ -197,13 +197,13 @@ export default class MarkUpCode {
 			</div>
 
 			<!-- text right (country in overview) -->
-			<div id="row4" style="width:100%;" class="dbg">
+			<div id="row4" style="width:100%;" class="dbg" aria-hidden="true">
 				<div id="right1" style="height:5%; text-align:right; color:#0e47cb">...</div>
 				<div id="right2" style="height:5%; text-align:right; color:#0e47cb;"></div>
 			</div>
 
 			<!-- legend when contracted (ie overview legend) -->
-			<div id="row5" style="width:100%;" class="dbg">
+			<div id="row5" style="width:100%;" class="dbg" aria-hidden="true">
 				<span id="contractedLegend" style="padding: 0px 30px 5px 30px; display:flex; flex-direction:column; justify-content:space-between; ">
 					<span id="contractedLegendItem1">
 						<span class="dot" id="dot1"></span>

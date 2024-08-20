@@ -554,7 +554,11 @@ class Element extends HTMLElement {
 		const event = new Event("expanding")
 		this.dispatchEvent(event)
 
-		this.shadowRoot.getElementById("close").focus()
+		this.blur()
+		div.setAttribute("tabindex", "-1")
+		setTimeout( function (){ this.firstElementChild.firstElementChild.focus()	}.bind(this), 100)
+
+		this.setAttribute("aria-expanded", "true")
 	}
 
 	contract() {
@@ -615,6 +619,10 @@ class Element extends HTMLElement {
 
 		const event = new Event("contracting")
 		this.dispatchEvent(event)
+
+		div.setAttribute("tabindex", "0")
+		this.setAttribute("aria-expanded", "false")
+		setTimeout(function (){this.#$("main").focus()}.bind(this), 100)
 	}
 
 }
