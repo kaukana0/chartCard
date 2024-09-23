@@ -24,6 +24,7 @@ export default class MarkUpCode {
 				overflow: hidden;
 				overscroll-behavior: none;
 				background-color: white;
+				color: #262b38; /*dark100*/
 
 				--offsety: 0px;
 			}
@@ -144,7 +145,7 @@ export default class MarkUpCode {
 			}
 
 			.shrinkOnContracted {
-				height:59%;
+				height:61%;
 			}
 
 			.growOnExpanded {
@@ -154,6 +155,10 @@ export default class MarkUpCode {
 			.hideCard {
 				width:0px !important;
 				height:0px !important;
+			}
+
+			#header_c {
+				font-size:18px;
 			}
 
 		</style>
@@ -167,7 +172,7 @@ export default class MarkUpCode {
 			<!-- slot for selects; close button -->
 			<div id="row1" style="display:flex; width:100%;" class="dbg">
 				<div id="slotContainerTop" style="display:none; flex-grow:1; margin: 10px 10px 10px 0px;"> <slot name="slotTop"></slot> </div>
-				<symbol-button id="close" symbol="close" style="max-width:35px; max-height:35px; min-width:35px; min-height:35px; display:none; margin:20px -10px 0 0;" data-html2canvas-ignore aria-label="Button closing currently expanded card" alt="Close"></symbol-button>
+				<symbol-button id="close" symbol="close" style="max-width:32px; max-height:32px; min-width:32px; min-height:32px; display:none; margin:20px -10px 0 0;" data-html2canvas-ignore aria-label="Button closing currently expanded card" alt="Close"></symbol-button>
 			</div>
 
 			<!-- headers' buttons are moved here on narrow width -->
@@ -184,15 +189,15 @@ export default class MarkUpCode {
 				<div style="display:flex; flex-direction:column; flex-grow:1;">
 					<div id="row3header" style="display:flex; align-items:center;">
 						<h2 id="header_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">${titleLong}</h2>
-						<symbol-button id="info" symbol="info" style="display:none;" data-html2canvas-ignore alt="Information" aria-label="Button opening Dialog with Information about the Idicator." aria-haspopup="dialog"></symbol-button>
+						<symbol-button id="info" symbol="info" style="display:none;" data-html2canvas-ignore alt="Information" aria-label="Button opening Dialog with Information about the Indicator." aria-haspopup="dialog" title="Indicator information"></symbol-button>
 					</div>
 					<div id="subtitle_e" style="display:none; height:auto; margin-top: 3px; margin-right: 10px; margin-bottom:3px;">Subtitle</div>
 				</div>
 
 
 				<div id="switch" style="display:none; height:20px; display:flex; justify-content: flex-end;" data-html2canvas-ignore>
-					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart"  symbolDeactivated="lineChart" style="display:none; padding-right:20px;" alt="Switch to Line Chart" aria-label="Switch to Line Chart" isactivated></symbol-button>
-					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"  symbolDeactivated="dotPlot"     style="display:none;" alt="Switch to Dot Plot" aria-label="Switch to Dot Plot"></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo1" symbol="lineChart" size="42" symbolDeactivated="lineChart" style="max-width:44px; max-height:44px; min-width:44px; min-height:44px; display:none; padding-right:20px;" alt="Switch to Line Chart" aria-label="Switch to Line Chart" isactivated></symbol-button>
+					<symbol-button class="switchToButton" id="switchTo2" symbol="dotPlot"  size="42"  symbolDeactivated="dotPlot"     style="max-width:44px; max-height:44px; min-width:44px; min-height:44px; display:none;" alt="Switch to Dot Plot" aria-label="Switch to Dot Plot"></symbol-button>
 				</div>
 			</div>
 
@@ -204,7 +209,7 @@ export default class MarkUpCode {
 
 			<!-- legend when contracted (ie overview legend) -->
 			<div id="row5" style="width:100%;" class="dbg" aria-hidden="true">
-				<span id="contractedLegend" style="padding: 0px 30px 5px 30px; display:flex; flex-direction:column; justify-content:space-between; ">
+				<span id="contractedLegend" style="padding: 0px 30px 5px 30px; display:flex; flex-direction:column; justify-content:space-between; line-height: 1.2rem; max-height: 70px;">
 					<span id="contractedLegendItem1">
 						<span class="dot" id="dot1"></span>
 						<span id="statLegTxt1"></span>
@@ -331,8 +336,8 @@ export default class MarkUpCode {
 		}
 		.legendItemColor {
 			display: inline-block;
-			height: 26px;
-			width: 26px;
+			height: 24px;
+			width: 24px;
 			border-radius: 14px;
 		}
 		.disabledDotLine {
