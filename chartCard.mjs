@@ -313,7 +313,7 @@ class Element extends HTMLElement {
 				c1.display = hidePos
 				c2.display = hidePos
 				lo.display = hidePos
-				u.display = showPos
+				u.display = "flex"
 				le.style.display = "none"
 				break
 			default:
@@ -396,10 +396,20 @@ class Element extends HTMLElement {
 			return " " + this.#_unitShort
 		}
 	}
+
+	// there may be data in the dice (ie params.cols.length > 1), but possibly not in this very slice
+	#isDataAvailable(cols) {
+		for(let i=1;i<cols.length;i++) {	// skip first row
+			for(let j=1;j<cols[i].length;j++) {	// skip first col
+				if(cols[i][j]) {return true}
+			}
+		}
+		return false
+	}
 	
 	// TODO: refactor: A ChartCard shouldn't make assumptions about what types of charts it has.
 	setData1(params, cb) {
-		this.#_dataAvailable = params.cols.length > 1
+		this.#_dataAvailable = this.#isDataAvailable(params.cols)
 		this.#displayUnavailable()
 		Chart.init({
 			chartDOMElementId: this.chart1,
