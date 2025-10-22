@@ -323,8 +323,7 @@ class Element extends HTMLElement {
 
 	#displayUnavailable() {
 		if(this.#_dataAvailable || this.#_isExpanded) {
-			const dataUnavailableDisplayed = this.#$("dataUnavailableMsg").parentNode.style.getPropertyValue("left")==="0px"
-			if(dataUnavailableDisplayed) {
+			if(this.#_display===CCDISPLAY.NOTAVAILALBE) {
 				this.setChartContainerDisplay(CCDISPLAY.CHART1)
 			}
 		} else {
