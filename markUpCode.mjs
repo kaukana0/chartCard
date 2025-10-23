@@ -158,7 +158,7 @@ export default class MarkUpCode {
 			}
 
 			#header_c {
-				font-size:18px;
+				font-size:24px;
 			}
 
 		</style>
