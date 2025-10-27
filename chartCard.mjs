@@ -114,6 +114,7 @@ class Element extends HTMLElement {
 	set decimals(val) {this.#_decimals = val}
 
 	get chart1Displayed() {return this.#_display===CCDISPLAY.CHART1}
+	get notAvailableDisplayed() {return this.#_display===CCDISPLAY.NOTAVAILALBE}
 
 	connectedCallback() {
 		this.#installEventHandlers()
